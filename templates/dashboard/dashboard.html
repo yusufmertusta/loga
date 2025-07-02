@@ -1,416 +1,692 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Log Analyzer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="/static/css/styles.css">
-</head>
-<body>
-    <div class="app-layout">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <span class="logo-text">SecureAnalyzer</span>
-                </div>
-                <button class="sidebar-toggle" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
+{% extends 'base.html' %}
+{% load static %}
 
-            <nav class="sidebar-nav">
-                <div class="nav-section">
-                    <div class="nav-item active">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-home"></i>
-                            <span class="nav-text">Dashboard</span>
-                        </a>
-                    </div>
-                    <div class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-list-ul"></i>
-                            <span class="nav-text">Log Records</span>
-                        </a>
-                    </div>
-                    <div class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-chart-bar"></i>
-                            <span class="nav-text">Analytics</span>
-                        </a>
-                    </div>
-                    <div class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-upload"></i>
-                            <span class="nav-text">Upload CSV</span>
-                        </a>
-                    </div>
-                </div>
+{% block title %}Dashboard - Log Analyzer{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
 
-                <div class="nav-section">
-                    <div class="nav-section-title">Management</div>
-                    <div class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-users"></i>
-                            <span class="nav-text">Users</span>
-                        </a>
-                    </div>
-                    <div class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-cog"></i>
-                            <span class="nav-text">Settings</span>
-                        </a>
-                    </div>
-                </div>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div class="user-profile">
-                    <div class="user-avatar">
-                        <img src="https://ui-avatars.com/api/?name=Admin&background=667eea&color=fff" alt="User">
-                    </div>
-                    <div class="user-info">
-                        <div class="user-name">Admin User</div>
-                        <div class="user-role">Administrator</div>
-                    </div>
-                    <button class="user-menu-toggle">
-                        <i class="fas fa-chevron-up"></i>
-                    </button>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Top Header -->
-            <header class="top-header">
-                <div class="header-left">
-                    <h1 class="page-title">Dashboard</h1>
-                    <p class="page-subtitle">Monday, December 18, 2023</p>
-                </div>
-                <div class="header-right">
-                    <div class="search-container">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" class="search-input" placeholder="Search threats, IPs...">
-                    </div>
-                    <div class="header-actions">
-                        <button class="action-btn notification-btn">
-                            <i class="fas fa-bell"></i>
-                            <span class="notification-badge">3</span>
-                        </button>
-                        <button class="action-btn">
-                            <i class="fas fa-download"></i>
-                        </button>
-                        <button class="action-btn">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Dashboard Content -->
-            <div class="dashboard-content">
-                <!-- Stats Overview -->
-                <div class="stats-grid">
-                    <div class="stat-card primary">
-                        <div class="stat-icon">
-                            <i class="fas fa-database"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-value" id="totalThreats">24,847</div>
-                            <div class="stat-label">Total Threats</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>+12.5%</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="stat-card success">
-                        <div class="stat-icon">
-                            <i class="fas fa-shield-check"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-value" id="blockedThreats">1,247</div>
-                            <div class="stat-label">Blocked Threats</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>+8.2%</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="stat-card warning">
-                        <div class="stat-icon">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-value" id="activeThreats">47</div>
-                            <div class="stat-label">Active Threats</div>
-                            <div class="stat-change negative">
-                                <i class="fas fa-arrow-down"></i>
-                                <span>-3.1%</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="stat-card info">
-                        <div class="stat-icon">
-                            <i class="fas fa-network-wired"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-value" id="uniqueIps">8,924</div>
-                            <div class="stat-label">Unique IPs</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>+15.7%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Charts Section -->
-                <div class="charts-grid">
-                    <!-- Threat Analysis Chart -->
-                    <div class="chart-card large">
-                        <div class="card-header">
-                            <div class="card-title-section">
-                                <h3 class="card-title">Threat Analysis</h3>
-                                <p class="card-subtitle">Real-time threat detection trends</p>
-                            </div>
-                            <div class="card-actions">
-                                <div class="time-filter">
-                                    <button class="filter-btn active">7D</button>
-                                    <button class="filter-btn">30D</button>
-                                    <button class="filter-btn">90D</button>
+{% block content %}
+<!-- Welcome Card -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white;">
+            <div class="card-body p-4">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3">
+                                <div style="width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 1rem; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-shield-alt fa-2x"></i>
                                 </div>
                             </div>
-                        </div>
-                        <div class="card-content">
-                            <canvas id="threatAnalysisChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Severity Distribution -->
-                    <div class="chart-card medium">
-                        <div class="card-header">
-                            <div class="card-title-section">
-                                <h3 class="card-title">Severity Distribution</h3>
-                                <p class="card-subtitle">Threat severity breakdown</p>
+                            <div>
+                                <h3 class="mb-1" id="welcomeTitle">Welcome</h3>
+                                <p class="mb-0 opacity-75" id="welcomeSubtitle">Security Operations Center</p>
                             </div>
                         </div>
-                        <div class="card-content">
-                            <canvas id="severityChart"></canvas>
-                            <div class="severity-legend">
-                                <div class="legend-item">
-                                    <div class="legend-color critical"></div>
-                                    <div class="legend-info">
-                                        <div class="legend-label">Critical</div>
-                                        <div class="legend-value" id="criticalCount">127</div>
-                                    </div>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-color high"></div>
-                                    <div class="legend-info">
-                                        <div class="legend-label">High</div>
-                                        <div class="legend-value" id="highCount">453</div>
-                                    </div>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-color medium"></div>
-                                    <div class="legend-info">
-                                        <div class="legend-label">Medium</div>
-                                        <div class="legend-value" id="mediumCount">832</div>
-                                    </div>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-color low"></div>
-                                    <div class="legend-info">
-                                        <div class="legend-label">Low</div>
-                                        <div class="legend-value" id="lowCount">1,247</div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="d-flex gap-3">
+                            <span class="badge" style="background: rgba(255,255,255,0.2); padding: 0.5rem 1rem;">
+                                <i class="fas fa-map-marker-alt me-1"></i>Ankara, TR
+                            </span>
+                            <span class="badge" style="background: rgba(255,255,255,0.2); padding: 0.5rem 1rem;">
+                                <i class="fas fa-clock me-1"></i><span id="currentTime">--:--</span>
+                            </span>
                         </div>
                     </div>
-                </div>
-
-                <!-- Data Tables Section -->
-                <div class="tables-grid">
-                    <!-- Recent Threats -->
-                    <div class="table-card">
-                        <div class="card-header">
-                            <div class="card-title-section">
-                                <h3 class="card-title">Recent Threats</h3>
-                                <p class="card-subtitle">Latest security incidents</p>
-                            </div>
-                            <div class="card-actions">
-                                <button class="btn-secondary">
-                                    <i class="fas fa-external-link-alt"></i>
-                                    View All
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <div class="data-table">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Time</th>
-                                            <th>Threat</th>
-                                            <th>Source IP</th>
-                                            <th>Severity</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="recentThreatsTable">
-                                        <tr>
-                                            <td>
-                                                <div class="time-info">
-                                                    <div class="time">14:23</div>
-                                                    <div class="date">Dec 18</div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="threat-info">
-                                                    <div class="threat-name">SQL Injection Attempt</div>
-                                                    <div class="threat-type">Web Attack</div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <code class="ip-address">192.168.1.100</code>
-                                            </td>
-                                            <td>
-                                                <span class="severity-badge critical">Critical</span>
-                                            </td>
-                                            <td>
-                                                <span class="status-badge blocked">Blocked</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="time-info">
-                                                    <div class="time">14:18</div>
-                                                    <div class="date">Dec 18</div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="threat-info">
-                                                    <div class="threat-name">Malware Detection</div>
-                                                    <div class="threat-type">Malware</div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <code class="ip-address">10.0.0.45</code>
-                                            </td>
-                                            <td>
-                                                <span class="severity-badge high">High</span>
-                                            </td>
-                                            <td>
-                                                <span class="status-badge quarantined">Quarantined</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="time-info">
-                                                    <div class="time">14:12</div>
-                                                    <div class="date">Dec 18</div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="threat-info">
-                                                    <div class="threat-name">Brute Force Attack</div>
-                                                    <div class="threat-type">Authentication</div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <code class="ip-address">203.0.113.45</code>
-                                            </td>
-                                            <td>
-                                                <span class="severity-badge medium">Medium</span>
-                                            </td>
-                                            <td>
-                                                <span class="status-badge investigating">Investigating</span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- System Status -->
-                    <div class="status-card">
-                        <div class="card-header">
-                            <div class="card-title-section">
-                                <h3 class="card-title">System Status</h3>
-                                <p class="card-subtitle">Real-time monitoring</p>
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <div class="status-grid">
-                                <div class="status-item">
-                                    <div class="status-info">
-                                        <div class="status-label">CPU Usage</div>
-                                        <div class="status-value">67%</div>
-                                    </div>
-                                    <div class="status-bar">
-                                        <div class="status-progress" style="width: 67%"></div>
-                                    </div>
-                                </div>
-                                <div class="status-item">
-                                    <div class="status-info">
-                                        <div class="status-label">Memory</div>
-                                        <div class="status-value">84%</div>
-                                    </div>
-                                    <div class="status-bar">
-                                        <div class="status-progress warning" style="width: 84%"></div>
-                                    </div>
-                                </div>
-                                <div class="status-item">
-                                    <div class="status-info">
-                                        <div class="status-label">Network</div>
-                                        <div class="status-value">43%</div>
-                                    </div>
-                                    <div class="status-bar">
-                                        <div class="status-progress" style="width: 43%"></div>
-                                    </div>
-                                </div>
-                                <div class="status-item">
-                                    <div class="status-info">
-                                        <div class="status-label">Storage</div>
-                                        <div class="status-value">28%</div>
-                                    </div>
-                                    <div class="status-bar">
-                                        <div class="status-progress" style="width: 28%"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="system-health">
-                                <div class="health-indicator">
-                                    <div class="health-icon">
-                                        <i class="fas fa-check-circle"></i>
-                                    </div>
-                                    <div class="health-info">
-                                        <div class="health-status">System Healthy</div>
-                                        <div class="health-description">All services operational</div>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="col-lg-4 text-lg-end">
+                        <div class="d-flex justify-content-lg-end justify-content-start gap-2 mt-3 mt-lg-0">
+                            <button class="btn btn-light btn-sm">
+                                <i class="fas fa-sync-alt me-1"></i>Refresh
+                            </button>
+                            <button class="btn btn-light btn-sm">
+                                <i class="fas fa-download me-1"></i>Export
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
+</div>
 
-    <script src="/static/js/dashboard.js"></script>
-</body>
-</html>
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-lg-6 col-md-6">
+        <div class="stats-card">
+            <div class="stats-header">
+                <div class="stats-title">Total Logs</div>
+                <div class="stats-icon" style="background: #3b82f6;">
+                    <i class="fas fa-database"></i>
+                </div>
+            </div>
+            <div class="stats-value" id="totalLogs">0</div>
+            <div class="stats-change change-positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>+12% from last month</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-lg-6 col-md-6">
+        <div class="stats-card">
+            <div class="stats-header">
+                <div class="stats-title">Critical Threats</div>
+                <div class="stats-icon" style="background: #ef4444;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+            </div>
+            <div class="stats-value" id="criticalThreats">0</div>
+            <div class="stats-change change-negative">
+                <i class="fas fa-arrow-down"></i>
+                <span>-8% from yesterday</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-lg-6 col-md-6">
+        <div class="stats-card">
+            <div class="stats-header">
+                <div class="stats-title">Last 24 Hours</div>
+                <div class="stats-icon" style="background: #f59e0b;">
+                    <i class="fas fa-clock"></i>
+                </div>
+            </div>
+            <div class="stats-value" id="last24Hours">0</div>
+            <div class="stats-change change-positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>+15% activity</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-lg-6 col-md-6">
+        <div class="stats-card">
+            <div class="stats-header">
+                <div class="stats-title">Unique IPs</div>
+                <div class="stats-icon" style="background: #10b981;">
+                    <i class="fas fa-network-wired"></i>
+                </div>
+            </div>
+            <div class="stats-value" id="uniqueIps">0</div>
+            <div class="stats-change change-positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>+5% new sources</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row g-4 mb-4">
+    <!-- Threat Analysis Chart -->
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Threat Analysis</h6>
+                        <p class="card-subtitle">Real-time threat detection over time</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-secondary active">7D</button>
+                        <button class="btn btn-sm btn-secondary">30D</button>
+                        <button class="btn btn-sm btn-secondary">90D</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="threatAnalysisChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Severity Distribution -->
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title">Severity Distribution</h6>
+                <p class="card-subtitle">Threat levels breakdown</p>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="severityChart"></canvas>
+                </div>
+                <div class="mt-4">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <div style="width: 12px; height: 12px; background: #10b981; border-radius: 50%; margin-right: 0.5rem;"></div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Low</div>
+                                    <div style="font-weight: 600;" id="lowCount">0</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <div style="width: 12px; height: 12px; background: #f59e0b; border-radius: 50%; margin-right: 0.5rem;"></div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Medium</div>
+                                    <div style="font-weight: 600;" id="mediumCount">0</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <div style="width: 12px; height: 12px; background: #ef4444; border-radius: 50%; margin-right: 0.5rem;"></div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">High</div>
+                                    <div style="font-weight: 600;" id="highCount">0</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <div style="width: 12px; height: 12px; background: #6b7280; border-radius: 50%; margin-right: 0.5rem;"></div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Critical</div>
+                                    <div style="font-weight: 600;" id="criticalCount">0</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Data Tables Row -->
+<div class="row g-4">
+    <!-- Recent Activities -->
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Recent Security Events</h6>
+                        <p class="card-subtitle">Latest threat detections and analysis</p>
+                    </div>
+                    <a href="/logs/" class="btn btn-sm btn-primary">
+                        <i class="fas fa-external-link-alt me-1"></i>View All
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Threat</th>
+                                <th>Source IP</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentActivitiesTable">
+                            <tr>
+                                <td colspan="5" class="text-center py-4">
+                                    <div class="d-flex justify-content-center align-items-center">
+                                        <div class="spinner-border text-primary me-2" role="status" style="width: 1rem; height: 1rem;">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <span class="text-muted">Loading security events...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top IP Addresses & System Status -->
+    <div class="col-xl-4">
+        <!-- Top IP Addresses -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="card-title">Top IP Addresses</h6>
+                <p class="card-subtitle">Most active sources today</p>
+            </div>
+            <div class="card-body">
+                <div id="topIpsList">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status" style="width: 1.5rem; height: 1.5rem;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <div class="mt-2 text-muted">Loading IP data...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let threatChart = null;
+let severityChart = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Check authentication
+    checkAuthenticationAndRedirect();
+    
+    // Load dashboard data
+    loadDashboardData();
+    
+    // Update time
+    updateCurrentTime();
+    setInterval(updateCurrentTime, 1000);
+    
+    // Auto refresh data
+    setInterval(loadDashboardData, 30000);
+    
+    // Initialize system health monitoring
+    initSystemHealthMonitoring();
+});
+
+async function loadDashboardData() {
+    try {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            if (!window.location.href.includes('_redirect=true')) {
+                window.location.href = '/login/?_redirect=true';
+            }
+            return;
+        }
+        
+        const [statsResponse, logsResponse] = await Promise.all([
+            fetch('/api/stats/', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            }),
+            fetch('/api/logs/?limit=8', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+        ]);
+        
+        if (statsResponse.ok && logsResponse.ok) {
+            const statsData = await statsResponse.json();
+            const logsData = await logsResponse.json();
+            
+            updateStatsCards(statsData);
+            updateCharts(statsData);
+            updateRecentActivities(logsData.results);
+            updateTopIPs(statsData.top_ips);
+            updateWelcomeMessage();
+            
+        } else if (statsResponse.status === 401 || logsResponse.status === 401) {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('user_data');
+            if (!window.location.href.includes('_redirect=true')) {
+                window.location.href = '/login/?_redirect=true';
+            }
+        }
+    } catch (error) {
+        console.error('Dashboard data load error:', error);
+        showAlert('danger', 'Error loading dashboard data');
+    }
+}
+
+function updateStatsCards(data) {
+    animateNumber('totalLogs', data.total_logs);
+    animateNumber('criticalThreats', data.severity_stats.critical || 0);
+    animateNumber('last24Hours', data.last_24h_count);
+    animateNumber('uniqueIps', data.ip_stats.length);
+    
+    // Update severity counts
+    document.getElementById('lowCount').textContent = (data.severity_stats.low || 0).toLocaleString();
+    document.getElementById('mediumCount').textContent = (data.severity_stats.medium || 0).toLocaleString();
+    document.getElementById('highCount').textContent = (data.severity_stats.high || 0).toLocaleString();
+    document.getElementById('criticalCount').textContent = (data.severity_stats.critical || 0).toLocaleString();
+}
+
+function animateNumber(elementId, targetValue) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    const currentValue = parseInt(element.textContent.replace(/,/g, '')) || 0;
+    const difference = targetValue - currentValue;
+    const duration = 1000;
+    const steps = 60;
+    const stepValue = difference / steps;
+    let currentStep = 0;
+    
+    const timer = setInterval(() => {
+        currentStep++;
+        const newValue = Math.round(currentValue + (stepValue * currentStep));
+        element.textContent = newValue.toLocaleString();
+        
+        if (currentStep >= steps) {
+            clearInterval(timer);
+            element.textContent = targetValue.toLocaleString();
+        }
+    }, duration / steps);
+}
+
+function updateCharts(data) {
+    updateThreatAnalysisChart(data.daily_stats);
+    updateSeverityChart(data.severity_stats);
+}
+
+function updateThreatAnalysisChart(dailyData) {
+    const ctx = document.getElementById('threatAnalysisChart').getContext('2d');
+    
+    const labels = dailyData.map(item => item.date);
+    const data_values = dailyData.map(item => item.count);
+    
+    if (threatChart) {
+        threatChart.destroy();
+    }
+    
+    // Create gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(59, 130, 246, 0.5)');
+    gradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)');
+    
+    threatChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Threats Detected',
+                data: data_values,
+                borderColor: '#3b82f6',
+                backgroundColor: gradient,
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#3b82f6',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    borderColor: 'rgba(59, 130, 246, 0.3)',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    displayColors: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    },
+                    ticks: {
+                        color: '#64748b',
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#64748b',
+                        font: {
+                            size: 12
+                        }
+                    }
+                }
+            },
+            animation: {
+                duration: 2000,
+                easing: 'easeInOutCubic'
+            }
+        }
+    });
+}
+
+function updateSeverityChart(severityData) {
+    const ctx = document.getElementById('severityChart').getContext('2d');
+    
+    const data_values = [
+        severityData.low || 0,
+        severityData.medium || 0,
+        severityData.high || 0,
+        severityData.critical || 0
+    ];
+    const colors = ['#10b981', '#f59e0b', '#ef4444', '#6b7280'];
+    
+    if (severityChart) {
+        severityChart.destroy();
+    }
+    
+    severityChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Low', 'Medium', 'High', 'Critical'],
+            datasets: [{
+                data: data_values,
+                backgroundColor: colors,
+                borderWidth: 0,
+                cutout: '75%'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    borderColor: 'rgba(59, 130, 246, 0.3)',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    displayColors: false
+                }
+            },
+            animation: {
+                duration: 2000,
+                easing: 'easeInOutCubic'
+            }
+        }
+    });
+}
+
+function updateRecentActivities(logs) {
+    const tbody = document.getElementById('recentActivitiesTable');
+    
+    if (!logs || logs.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center py-4">
+                    <div class="text-muted">
+                        <i class="fas fa-inbox me-2"></i>
+                        No recent security events
+                    </div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = logs.map(log => {
+        const date = new Date(log.receive_time);
+        const timeAgo = getTimeAgo(date);
+        const severityBadge = getSeverityBadge(log.severity);
+        
+        return `
+            <tr style="cursor: pointer;" onclick="viewLogDetails(${log.id})">
+                <td>
+                    <div style="font-size: 0.875rem; color: var(--text-muted);">${timeAgo}</div>
+                </td>
+                <td>
+                    <div style="font-weight: 500; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" 
+                         title="${log.threat}">
+                        ${log.threat}
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">${log.type}</div>
+                </td>
+                <td>
+                    <code style="font-size: 0.875rem; background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 0.25rem 0.5rem; border-radius: 0.375rem;">
+                        ${log.source_ip}
+                    </code>
+                </td>
+                <td>${severityBadge}</td>
+                <td>
+                    <span class="badge badge-success">Analyzed</span>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function updateTopIPs(topIps) {
+    const container = document.getElementById('topIpsList');
+    
+    if (!topIps || topIps.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-4 text-muted">
+                <i class="fas fa-globe me-2"></i>
+                No IP data available
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = topIps.slice(0, 6).map((ip, index) => `
+        <div class="d-flex justify-content-between align-items-center py-3 ${index < topIps.length - 1 ? 'border-bottom' : ''}" 
+             style="border-color: var(--border-color);">
+            <div class="d-flex align-items-center">
+                <div style="width: 8px; height: 8px; background: var(--primary); border-radius: 50%; margin-right: 0.75rem;"></div>
+                <div>
+                    <div style="font-weight: 500; font-family: monospace;">${ip[0]}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">
+                        <i class="fas fa-map-marker-alt me-1"></i>Unknown Location
+                    </div>
+                </div>
+            </div>
+            <div class="text-end">
+                <div style="font-weight: 600; color: var(--primary);">${ip[1]}</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">requests</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function updateWelcomeMessage() {
+    const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+    const titleElement = document.getElementById('welcomeTitle');
+    const subtitleElement = document.getElementById('welcomeSubtitle');
+    
+    if (userData.first_name) {
+        titleElement.textContent = `Welcome, ${userData.first_name}`;
+    } else if (userData.username) {
+        titleElement.textContent = `Welcome, ${userData.username}`;
+    } else {
+        titleElement.textContent = 'Welcome';
+    }
+}
+
+function updateCurrentTime() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+    });
+    document.getElementById('currentTime').textContent = timeString;
+}
+
+function getSeverityBadge(severity) {
+    const badges = {
+        'low': '<span class="badge badge-success">Low</span>',
+        'medium': '<span class="badge badge-warning">Medium</span>',
+        'high': '<span class="badge badge-danger">High</span>',
+        'critical': '<span class="badge badge-danger">Critical</span>'
+    };
+    return badges[severity] || `<span class="badge badge-info">${severity}</span>`;
+}
+
+function getTimeAgo(date) {
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000);
+    
+    if (diff < 60) return 'Just now';
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    return `${Math.floor(diff / 86400)}d ago`;
+}
+
+function viewLogDetails(logId) {
+    // Navigate to log details or show modal
+    window.location.href = `/logs/?highlight=${logId}`;
+}
+
+function initSystemHealthMonitoring() {
+    // Simulate real-time system metrics
+    setInterval(() => {
+        updateSystemMetrics();
+    }, 5000);
+}
+
+function updateSystemMetrics() {
+    const metrics = [
+        { id: 'cpu', min: 40, max: 90 },
+        { id: 'memory', min: 60, max: 95 },
+        { id: 'network', min: 20, max: 80 },
+        { id: 'disk', min: 15, max: 60 }
+    ];
+    
+    metrics.forEach(metric => {
+        const value = Math.floor(Math.random() * (metric.max - metric.min + 1)) + metric.min;
+        const usageElement = document.getElementById(`${metric.id}Usage`);
+        const barElement = document.getElementById(`${metric.id}Bar`);
+        
+        if (usageElement && barElement) {
+            usageElement.textContent = value + '%';
+            barElement.style.width = value + '%';
+            
+            // Update color based on value
+            barElement.className = 'progress-bar';
+            if (value > 80) {
+                barElement.classList.add('progress-bar-danger');
+            } else if (value > 60) {
+                barElement.classList.add('progress-bar-warning');
+            } else {
+                barElement.classList.add('progress-bar-success');
+            }
+        }
+    });
+}
+
+function checkAuthenticationAndRedirect() {
+    const token = localStorage.getItem('access_token');
+    if (!token && !window.location.href.includes('_redirect=true')) {
+        window.location.href = '/login/?_redirect=true';
+        return;
+    }
+}
+</script>
+{% endblock %}

@@ -1,28 +1,23 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Ana Sayfa - Log Analyzer{% endblock %}
+{% block title %}Ana Sayfa - LogTrackr{% endblock %}
 
 {% block content %}
 <div class="container" >
     <!-- Hero Section -->
     <section class="hero-section py-5">
-        <div class="row align-items-center min-vh-100">
+        <div class="row min-vh-100" style="margin-top: 60px;">
             <div class="col-lg-6">
                 <div class="hero-content animate-fade-in">
-                    <div class="hero-badge mb-4">
-                        <span class="badge bg-gradient text-white px-4 py-2 rounded-pill">
-                            <i class="fas fa-rocket me-2"></i>Yeni Nesil Güvenlik Analizi
-                        </span>
-                    </div>
                     
                     <h1 class="display-3 fw-bold text-white mb-4">
-                        <span class="text-gradient">Log Analyzer</span>
+                        <span class="text-gradient">LogTrackr</span>
                         <br>
-                        <span class="text-white-75">Güvenlik Analiz Platformu</span>
+                        <span class="text-blue-75">Güvenlik Analiz Platformu</span>
                     </h1>
                     
-                    <p class="lead text-white-75 mb-5 fs-5">
+                    <p class="lead text-blue-75 mb-5 fs-5">
                         Log analizi ile güvenlik tehditlerini tespit edin, 
                         gerçek zamanlı izleme yapın ve kapsamlı raporlar alın. 
                         Modern dashboard ile verilerinizi görselleştirin.
@@ -33,10 +28,6 @@
                             <i class="fas fa-sign-in-alt me-2"></i>
                             Hemen Başla
                         </a>
-                        <a href="/register/" class="btn btn-outline-light btn-lg px-5 py-3" id="registerBtn">
-                            <i class="fas fa-user-plus me-2"></i>
-                            Ücretsiz Kayıt
-                        </a>
                         <a href="/dashboard/" class="btn btn-success btn-lg px-5 py-3 animate-glow" id="dashboardBtn" style="display: none;">
                             <i class="fas fa-tachometer-alt me-2"></i>
                             Dashboard'a Git
@@ -46,19 +37,19 @@
                     <div class="hero-stats row text-center">
                         <div class="col-4">
                             <div class="stat-item">
-                                <h3 class="fw-bold text-white mb-1">99.9%</h3>
+                                <h3 class="fw-bold text-blue-75 mb-1">99.9%</h3>
                                 <small class="text-white-50">Doğruluk</small>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="stat-item">
-                                <h3 class="fw-bold text-white mb-1">24/7</h3>
+                                <h3 class="fw-bold text-blue-75 mb-1">24/7</h3>
                                 <small class="text-white-50">İzleme</small>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="stat-item">
-                                <h3 class="fw-bold text-white mb-1">< 1ms</h3>
+                                <h3 class="fw-bold text-blue-75 mb-1">< 1ms</h3>
                                 <small class="text-white-50">Analiz</small>
                             </div>
                         </div>
@@ -76,7 +67,7 @@
                                     <span class="control control-minimize"></span>
                                     <span class="control control-maximize"></span>
                                 </div>
-                                <div class="window-title">Log Analyzer Dashboard</div>
+                                <div class="window-title">LogTrackr Dashboard</div>
                             </div>
                             <div class="window-content">
                                 <div class="preview-grid">
@@ -161,16 +152,19 @@
                 </div>
             </div>
         </div>
+        
     </section>
+          
+    
     
     <!-- Features Section -->
     <section class="features-section py-5">
         <div class="container">
             <div class="section-header text-center mb-5">
-                <h2 class="display-4 fw-bold text-white mb-4">
+                <h2 class="display-4 fw-bold text-blue-75 mb-4">
                     Güçlü Özellikler
                 </h2>
-                <p class="lead text-white-75 mx-auto" style="max-width: 600px;">
+                <p class="lead text-blue-75 mx-auto" style="max-width: 600px;">
                     Modern teknolojiler ve yapay zeka desteği ile log analizinizi 
                     bir üst seviyeye taşıyın
                 </p>
@@ -184,7 +178,7 @@
                         <div class="feature-icon mb-4">
                             <i class="fas fa-tachometer-alt fa-2x"></i>
                         </div>
-                        <h5 class="fw-bold mb-3">Real-time Monitoring</h5>
+                        <h5 class="fw-bold mb-3 text-blue-75">Real-time Monitoring</h5>
                         <p class="text-muted mb-4">
                             Gerçek zamanlı log izleme ve anında alarm sistemi. 
                             Kritik olayları kaçırmayın, hemen harekete geçin.
@@ -201,7 +195,7 @@
                         <div class="feature-icon mb-4">
                             <i class="fas fa-chart-pie fa-2x"></i>
                         </div>
-                        <h5 class="fw-bold mb-3">Advanced Visualization</h5>
+                        <h5 class="fw-bold mb-3 text-blue-75">Advanced Visualization</h5>
                         <p class="text-muted mb-4">
                             İnteraktif grafikler ve dashboard'lar ile verilerinizi 
                             görselleştirin. Chart.js ile dinamik raporlama.
@@ -223,7 +217,7 @@
                         <div class="feature-icon mb-4">
                             <i class="fas fa-cloud-upload-alt fa-2x"></i>
                         </div>
-                        <h5 class="fw-bold mb-3">Easy CSV Upload</h5>
+                        <h5 class="fw-bold mb-3 text-blue-75">Easy CSV Upload</h5>
                         <p class="text-muted mb-4">
                             Drag & drop ile kolay dosya yükleme. Büyük CSV dosyalarını 
                             hızla işleyin ve analiz edin.
@@ -242,7 +236,7 @@
                         <div class="feature-icon mb-4">
                             <i class="fas fa-shield-alt fa-2x"></i>
                         </div>
-                        <h5 class="fw-bold mb-3">Enterprise Security</h5>
+                        <h5 class="fw-bold mb-3 text-blue-75">Enterprise Security</h5>
                         <p class="text-muted mb-4">
                             JWT token tabanlı güvenlik, rol bazlı erişim kontrolü 
                             ve şifrelenmiş veri saklama.
@@ -260,8 +254,8 @@
                     <div class="feature-card h-100">
                         <div class="feature-icon mb-4">
                             <i class="fas fa-mobile-alt fa-2x"></i>
-                        </div>
-                        <h5 class="fw-bold mb-3">Responsive Design</h5>
+                        </div>  
+                        <h5 class="fw-bold mb-3 text-blue-75">Responsive Design</h5>
                         <p class="text-muted mb-4">
                             Her cihazda mükemmel deneyim. Mobil-first tasarım 
                             anlayışı ile her yerden erişim.
@@ -322,46 +316,20 @@
             </div>
         </div>
     </section>
-    
-    <!-- CTA Section -->
-    <section class="cta-section py-5">
-        <div class="container">
-            <div class="cta-container text-center">
-                <div class="cta-content">
-                    <h2 class="display-4 fw-bold text-white mb-4">
-                        Güvenliğinizi Bir Sonraki Seviyeye Taşıyın
-                    </h2>
-                    <p class="lead text-white-75 mb-5 mx-auto" style="max-width: 600px;">
-                        Hemen başlayın ve log analizinizi otomatikleştirin. 
-                        Ücretsiz hesap açın ve premium özellikleri keşfedin.
-                    </p>
-                    <div class="cta-actions">
-                        <a href="/register/" class="btn btn-primary btn-lg px-5 py-3 me-3 animate-glow">
-                            <i class="fas fa-rocket me-2"></i>
-                            Ücretsiz Başla
-                        </a>
-                        <a href="/demo/" class="btn btn-outline-light btn-lg px-5 py-3">
-                            <i class="fas fa-play me-2"></i>
-                            Demo İzle
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+
 </div>
 
 <style>
-    .text-white-75 {
-        color: rgba(255, 255, 255, 0.75) !important;
+    .text-blue-75 {
+        color: rgb(4, 22, 82) !important;
     }
     
     .text-white-50 {
-        color: rgba(255, 255, 255, 0.5) !important;
+        color: rgb(4, 22, 82) !important;
     }
     
     .text-gradient {
-        background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+        background: linear-gradient(135deg, rgb(61, 74, 248) 0%, #07336d 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -496,19 +464,34 @@
         width: 100%;
         height: 60px;
     }
+
+    .blur-block {
+        position: absolute;
+        width: 1000px;
+        height: 500px;
+        background: rgba(94, 164, 255, 0.1);
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 5%; 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgb(133, 151, 255);
+        font-size: 1.5rem;
+    }   
     
     .floating-element {
         position: absolute;
-        width: 60px;
-        height: 60px;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
+        width: 80px;
+        height: 80px;
+        background: rgba(94, 164, 255, 0.1);
+        backdrop-filter: blur(5px);
         border: 1px solid rgba(255, 255, 255, 0.2);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
+        color: rgb(133, 151, 255);
         font-size: 1.5rem;
         animation: float 6s ease-in-out infinite;
     }
@@ -520,8 +503,8 @@
     }
     
     .element-2 {
-        top: 50%;
-        left: -10%;
+        top: 30%;
+        left: -5%;
         animation-delay: 2s;
     }
     

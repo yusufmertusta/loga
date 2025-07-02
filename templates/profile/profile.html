@@ -81,90 +81,12 @@
                         </div>
                     </div>
                 </div>
-                
-                <div class="text-muted" style="font-size: 0.875rem;">
-                    <i class="fas fa-calendar me-2"></i>
-                    Member since: <span id="memberSince">Loading...</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Quick Actions -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h6 class="card-title">Quick Actions</h6>
-                <p class="card-subtitle">Frequently used features</p>
-            </div>
-            <div class="card-body">
-                <div class="d-grid gap-3">
-                    <a href="/upload/" class="btn btn-primary btn-sm">
-                        <i class="fas fa-upload me-2"></i>
-                        Upload New CSV
-                    </a>
-                    <a href="/logs/" class="btn btn-secondary btn-sm">
-                        <i class="fas fa-list me-2"></i>
-                        View My Logs
-                    </a>
-                    <a href="/statistics/" class="btn btn-secondary btn-sm">
-                        <i class="fas fa-chart-bar me-2"></i>
-                        View Statistics
-                    </a>
-                    <button class="btn btn-secondary btn-sm" onclick="showChangePasswordModal()">
-                        <i class="fas fa-key me-2"></i>
-                        Change Password
-                    </button>
-                </div>
             </div>
         </div>
     </div>
     
     <!-- Profile Settings -->
     <div class="col-lg-8">
-        <!-- Update Profile Form -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h6 class="card-title">Update Profile</h6>
-                <p class="card-subtitle">Modify your personal information</p>
-            </div>
-            <div class="card-body">
-                <form id="profileUpdateForm">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="firstName" class="form-label">
-                                <i class="fas fa-user me-1"></i>First Name
-                            </label>
-                            <input type="text" class="form-control" id="firstName" name="first_name" required>
-                            <div class="invalid-feedback" id="firstNameError"></div>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label for="lastName" class="form-label">
-                                <i class="fas fa-user me-1"></i>Last Name
-                            </label>
-                            <input type="text" class="form-control" id="lastName" name="last_name" required>
-                            <div class="invalid-feedback" id="lastNameError"></div>
-                        </div>
-                        
-                        <div class="col-12">
-                            <label for="email" class="form-label">
-                                <i class="fas fa-envelope me-1"></i>Email Address
-                            </label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                            <div class="invalid-feedback" id="emailError"></div>
-                        </div>
-                        
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary" id="updateButton">
-                                <span id="updateButtonText">
-                                    <i class="fas fa-save me-2"></i>Update Profile
-                                </span>
-                                <div class="spinner-border spinner-border-sm ms-2" id="updateSpinner" style="display: none;"></div>
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
         
         <!-- Upload History -->
         <div class="card mb-4">
@@ -199,143 +121,10 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Account Settings -->
-        <div class="card">
-            <div class="card-header">
-                <h6 class="card-title">Account Settings</h6>
-                <p class="card-subtitle">Preferences and security options</p>
-            </div>
-            <div class="card-body">
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <div class="d-flex justify-content-between align-items-center p-3 rounded-lg" style="background: var(--bg-main);">
-                            <div>
-                                <div style="font-weight: 500; margin-bottom: 0.25rem;">Email Notifications</div>
-                                <div style="font-size: 0.875rem; color: var(--text-muted);">Get updates about new features</div>
-                            </div>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <div class="d-flex justify-content-between align-items-center p-3 rounded-lg" style="background: var(--bg-main);">
-                            <div>
-                                <div style="font-weight: 500; margin-bottom: 0.25rem;">Auto Refresh</div>
-                                <div style="font-size: 0.875rem; color: var(--text-muted);">Automatically refresh dashboard</div>
-                            </div>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="autoRefresh" checked>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-12">
-                        <hr style="border-color: var(--border-color);">
-                        <div class="p-4 rounded-lg" style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2);">
-                            <h6 style="color: var(--danger); margin-bottom: 1rem;">
-                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                Danger Zone
-                            </h6>
-                            <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem;">
-                                Once you delete your account, there is no going back. 
-                                Please be certain about this action.
-                            </p>
-                            <button class="btn btn-danger btn-sm" onclick="showDeleteAccountModal()">
-                                <i class="fas fa-trash me-2"></i>
-                                Delete Account
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
     </div>
 </div>
 
-<!-- Change Password Modal -->
-<div class="modal fade" id="changePasswordModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-key me-2"></i>
-                    Change Password
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="changePasswordForm">
-                    <div class="form-group mb-3">
-                        <label for="currentPassword" class="form-label">Current Password</label>
-                        <input type="password" class="form-control" id="currentPassword" required>
-                        <div class="invalid-feedback" id="currentPasswordError"></div>
-                    </div>
-                    
-                    <div class="form-group mb-3">
-                        <label for="newPassword" class="form-label">New Password</label>
-                        <input type="password" class="form-control" id="newPassword" required>
-                        <div style="font-size: 0.875rem; color: var(--text-muted); margin-top: 0.25rem;">
-                            Must be at least 8 characters long
-                        </div>
-                        <div class="invalid-feedback" id="newPasswordError"></div>
-                    </div>
-                    
-                    <div class="form-group mb-3">
-                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
-                        <input type="password" class="form-control" id="confirmPassword" required>
-                        <div class="invalid-feedback" id="confirmPasswordError"></div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="changePassword()">
-                    <i class="fas fa-save me-2"></i>
-                    Change Password
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Delete Account Modal -->
-<div class="modal fade" id="deleteAccountModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header" style="background: var(--danger); color: white;">
-                <h5 class="modal-title">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    Delete Account
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="alert alert-danger" role="alert">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    <strong>Warning!</strong> This action cannot be undone. 
-                    Your account and all data will be permanently deleted.
-                </div>
-                
-                <p>Are you absolutely sure you want to delete your account?</p>
-                
-                <div class="form-group">
-                    <label for="deleteConfirmPassword" class="form-label">Enter your password to confirm:</label>
-                    <input type="password" class="form-control" id="deleteConfirmPassword" placeholder="Current password">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" onclick="deleteAccount()">
-                    <i class="fas fa-trash me-2"></i>
-                    Permanently Delete Account
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Logout Confirmation Modal -->
 <div class="modal fade" id="logoutModal" tabindex="-1">
@@ -399,7 +188,6 @@ async function loadProfile() {
             const data = await response.json();
             userProfile = data;
             updateProfileDisplay(data);
-            fillProfileForm(data.user);
         } else {
             throw new Error('Profile could not be loaded');
         }
@@ -424,7 +212,6 @@ function updateProfileDisplay(data) {
     document.getElementById('profileEmail').textContent = user.email || 'No email provided';
     document.getElementById('userLogCount').textContent = stats.logs_uploaded.toLocaleString();
     document.getElementById('userUploadCount').textContent = stats.upload_sessions.toLocaleString();
-    document.getElementById('memberSince').textContent = joinDate;
     
     // Update header
     document.getElementById('profileHeaderName').textContent = fullName;
@@ -433,11 +220,6 @@ function updateProfileDisplay(data) {
     document.getElementById('profileHeaderStats').textContent = `${stats.logs_uploaded} logs uploaded`;
 }
 
-function fillProfileForm(user) {
-    document.getElementById('firstName').value = user.first_name || '';
-    document.getElementById('lastName').value = user.last_name || '';
-    document.getElementById('email').value = user.email || '';
-}
 
 async function updateProfile(e) {
     e.preventDefault();

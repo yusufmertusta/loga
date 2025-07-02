@@ -582,6 +582,7 @@ body {
     color: var(--danger-600);
 }
 
+
 /* Charts Grid */
 .charts-grid {
     display: grid;

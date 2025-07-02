@@ -132,11 +132,162 @@ class LogListView(ListAPIView):
         return queryset
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def stats_view(request):
+    """
+    İstatistik verileri API view'ı.
+    GET: Chart.js için gerekli istatistik verilerini döndürür.
+    """
+    try:
+        # Toplam log sayısı
+        total_logs = Log.objects.count()
+        
+        # Severity dağılımı - Düzeltme: value yerine değerleri doğru format
+        severity_data = Log.objects.values('severity').annotate(count=Count('severity'))
+        severity_stats = {}
+        
+        # Tüm severity seviyelerini initialize et
+        for severity in ['low', 'medium', 'high', 'critical']:
+            severity_stats[severity] = 0
+        
+        # Gerçek verileri ekle
+        for item in severity_data:
+            severity_name = item['severity'].lower() if item['severity'] else 'medium'
+            if severity_name in severity_stats:
+                severity_stats[severity_name] = item['count']
+        
+        print(f"DEBUG - Severity Stats: {severity_stats}")  # Debug için
+        
+        # En aktif IP adresleri - Düzeltme: object format
+        ip_data = Log.objects.values('source_ip').annotate(count=Count('source_ip')).order_by('-count')[:20]
+        ip_stats = []
+        for item in ip_data:
+            ip_stats.append({
+                'source_ip': item['source_ip'],
+                'count': item['count']
+            })
+        
+        # Saatlik dağılım - Düzeltme: 24 saatlik tam veri
+        now = timezone.now()
+        hourly_stats = []
+        
+        # Her saat için veri hazırla (0-23)
+        hourly_counts = {}
+        
+        # Son 24 saatteki verileri al
+        last_24h = now - timedelta(hours=24)
+        recent_logs = Log.objects.filter(receive_time__gte=last_24h)
+        
+        # Saate göre grupla
+        for log in recent_logs:
+            hour = log.receive_time.hour
+            hourly_counts[hour] = hourly_counts.get(hour, 0) + 1
+        
+        # 24 saatlik array oluştur
+        for hour in range(24):
+            hourly_stats.append({
+                'hour': f"{hour:02d}:00",
+                'count': hourly_counts.get(hour, 0)
+            })
+        
+        print(f"DEBUG - Hourly Stats Sample: {hourly_stats[7]}")  # Debug için saat 7
+        
+        # Tehdit istatistikleri - Düzeltme: object format
+        threat_data = Log.objects.values('threat').annotate(count=Count('threat')).order_by('-count')[:20]
+        threat_stats = []
+        for item in threat_data:
+            threat_stats.append({
+                'threat': item['threat'],
+                'count': item['count']
+            })
+        
+        # Type dağılımı - Düzeltme: dict format
+        type_data = Log.objects.values('type').annotate(count=Count('type'))
+        type_stats = {}
+        for item in type_data:
+            type_stats[item['type']] = item['count']
+        
+        # Son 7 günün günlük log sayıları - Düzeltme: date format
+        daily_stats = []
+        today = timezone.now().date()
+        
+        # Günlük sayıları hesapla
+        daily_counts = {}
+        for i in range(7):
+            target_date = today - timedelta(days=i)
+            count = Log.objects.filter(receive_time__date=target_date).count()
+            daily_counts[target_date] = count
+        
+        # Kronolojik sırada array oluştur
+        for i in range(6, -1, -1):  # 6 gün önceden bugüne
+            target_date = today - timedelta(days=i)
+            daily_stats.append({
+                'date': target_date.strftime('%Y-%m-%d'),  # ISO format
+                'count': daily_counts.get(target_date, 0)
+            })
+        
+        # Son 24 saatteki log sayısı
+        last_24h_start = now - timedelta(hours=24)
+        last_24h_count = Log.objects.filter(receive_time__gte=last_24h_start).count()
+        
+        # En aktif IP'ler (tuple array format - eski kod uyumluluğu için)
+        top_ips_data = Log.objects.values('source_ip').annotate(count=Count('source_ip')).order_by('-count')[:10]
+        top_ips = []
+        for item in top_ips_data:
+            top_ips.append([item['source_ip'], item['count']])
+        
+        # Final response
+        stats_data = {
+            'total_logs': total_logs,
+            'severity_stats': severity_stats,
+            'ip_stats': ip_stats,
+            'hourly_stats': hourly_stats,
+            'threat_stats': threat_stats,
+            'type_stats': type_stats,
+            'daily_stats': daily_stats,
+            'top_ips': top_ips,
+            'last_24h_count': last_24h_count
+        }
+        
+        # Debug log
+        print(f"DEBUG - Final stats summary:")
+        print(f"  Total logs: {total_logs}")
+        print(f"  Critical count: {severity_stats.get('critical', 0)}")
+        print(f"  IP stats count: {len(ip_stats)}")
+        print(f"  Hourly stats count: {len(hourly_stats)}")
+        print(f"  Daily stats count: {len(daily_stats)}")
+        
+        # Serializer kullan
+        serializer = StatsSerializer(stats_data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        print(f"ERROR in stats_view: {str(e)}")  # Debug için
+        
+        # Hata durumunda boş veri döndür
+        empty_stats = {
+            'total_logs': 0,
+            'severity_stats': {'low': 0, 'medium': 0, 'high': 0, 'critical': 0},
+            'ip_stats': [],
+            'hourly_stats': [{'hour': f"{h:02d}:00", 'count': 0} for h in range(24)],
+            'threat_stats': [],
+            'type_stats': {},
+            'daily_stats': [],
+            'top_ips': [],
+            'last_24h_count': 0
+        }
+        
+        return Response(empty_stats, status=status.HTTP_200_OK)
+
+
+# Ek olarak, CSV upload fonksiyonunda da bir düzeltme önerisi:
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def upload_csv_view(request):
     """
-    CSV dosya yükleme API view'ı.
+    CSV dosya yükleme API view'ı - Düzeltilmiş versiyon.
     POST: CSV dosyasını alır, parse eder ve veritabanına kaydeder.
     """
     
@@ -150,56 +301,75 @@ def upload_csv_view(request):
         # Pandas ile CSV dosyasını oku
         df = pd.read_csv(csv_file)
         
+        # Sütun isimlerini temizle
+        df.columns = df.columns.str.strip()
+        
+        print(f"DEBUG - CSV columns: {list(df.columns)}")
+        print(f"DEBUG - CSV shape: {df.shape}")
+        print(f"DEBUG - First row: {df.iloc[0].to_dict() if len(df) > 0 else 'Empty'}")
+        
         # Gerekli sütunların varlığını kontrol et
         required_columns = ['receive_time', 'type', 'severity', 'threat', 'source_ip']
         missing_columns = [col for col in required_columns if col not in df.columns]
         
         if missing_columns:
             return Response({
-                'error': f'CSV dosyasında eksik sütunlar: {", ".join(missing_columns)}'
+                'error': f'CSV dosyasında eksik sütunlar: {", ".join(missing_columns)}',
+                'available_columns': list(df.columns)
             }, status=status.HTTP_400_BAD_REQUEST)
         
         # Log kayıtlarını oluştur
         logs_to_create = []
         processed_count = 0
         error_count = 0
+        errors = []
         
         for index, row in df.iterrows():
             try:
                 # Tarih formatını düzenle
-                receive_time_str = str(row['receive_time'])
+                receive_time_str = str(row['receive_time']).strip()
                 
-                # Farklı tarih formatlarını dene
+                # Tarih parse et
                 try:
                     receive_time = pd.to_datetime(receive_time_str)
                 except:
-                    # Manuel format denemesi
                     try:
                         receive_time = datetime.strptime(receive_time_str, '%Y-%m-%d %H:%M:%S')
                     except:
-                        receive_time = datetime.strptime(receive_time_str, '%Y-%m-%d %H:%M')
+                        try:
+                            receive_time = datetime.strptime(receive_time_str, '%Y-%m-%d %H:%M')
+                        except:
+                            raise ValueError(f"Tarih formatı tanınamadı: {receive_time_str}")
                 
                 # Severity değerini normalize et
                 severity = str(row['severity']).lower().strip()
-                if severity not in ['low', 'medium', 'high', 'critical']:
-                    # Bazı genel dönüşümler
-                    if severity in ['düşük', 'low']:
-                        severity = 'low'
-                    elif severity in ['orta', 'medium']:
-                        severity = 'medium'
-                    elif severity in ['yüksek', 'high']:
-                        severity = 'high'
-                    elif severity in ['kritik', 'critical']:
-                        severity = 'critical'
-                    else:
-                        severity = 'medium'  # Default
+                valid_severities = ['low', 'medium', 'high', 'critical']
+                
+                if severity not in valid_severities:
+                    # Türkçe değerleri İngilizce'ye çevir
+                    severity_mapping = {
+                        'düşük': 'low',
+                        'orta': 'medium', 
+                        'yüksek': 'high',
+                        'kritik': 'critical'
+                    }
+                    severity = severity_mapping.get(severity, 'medium')
+                
+                # Type ve threat alanlarını temizle
+                log_type = str(row['type']).strip()
+                threat = str(row['threat']).strip()
+                source_ip = str(row['source_ip']).strip()
+                
+                # IP adresini validate et (basit kontrol)
+                if not source_ip or source_ip == 'nan':
+                    source_ip = '0.0.0.0'
                 
                 log = Log(
                     receive_time=receive_time,
-                    type=str(row['type']),
+                    type=log_type,
                     severity=severity,
-                    threat=str(row['threat']),
-                    source_ip=str(row['source_ip']),
+                    threat=threat,
+                    source_ip=source_ip,
                     uploaded_by=request.user
                 )
                 logs_to_create.append(log)
@@ -207,11 +377,13 @@ def upload_csv_view(request):
                 
             except Exception as e:
                 error_count += 1
+                errors.append(f"Satır {index + 2}: {str(e)}")
                 continue
         
         # Bulk create ile veritabanına kaydet
         if logs_to_create:
-            Log.objects.bulk_create(logs_to_create)
+            Log.objects.bulk_create(logs_to_create, batch_size=1000)
+            print(f"DEBUG - Successfully created {len(logs_to_create)} logs")
         
         # Upload history kaydet
         UploadHistory.objects.create(
@@ -222,119 +394,34 @@ def upload_csv_view(request):
             error_message=f'{error_count} kayıt işlenemedi' if error_count > 0 else None
         )
         
-        return Response({
+        response_data = {
             'message': 'CSV dosyası başarıyla yüklendi.',
             'processed_count': processed_count,
             'error_count': error_count,
             'total_rows': len(df)
-        }, status=status.HTTP_201_CREATED)
+        }
+        
+        if error_count > 0 and len(errors) <= 10:  # İlk 10 hatayı göster
+            response_data['sample_errors'] = errors[:10]
+        
+        return Response(response_data, status=status.HTTP_201_CREATED)
         
     except Exception as e:
+        error_msg = str(e)
+        print(f"ERROR in upload_csv_view: {error_msg}")
+        
         # Hata durumunda upload history kaydet
         UploadHistory.objects.create(
             user=request.user,
             filename=csv_file.name,
             record_count=0,
             success=False,
-            error_message=str(e)
+            error_message=error_msg
         )
         
         return Response({
-            'error': f'CSV dosyası işlenirken hata oluştu: {str(e)}'
+            'error': f'CSV dosyası işlenirken hata oluştu: {error_msg}'
         }, status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def stats_view(request):
-    """
-    İstatistik verileri API view'ı.
-    GET: Chart.js için gerekli istatistik verilerini döndürür.
-    """
-    
-    # Toplam log sayısı
-    total_logs = Log.objects.count()
-    
-    # Severity dağılımı
-    severity_stats = dict(Log.objects.values('severity').annotate(count=Count('severity')))
-    
-    # En aktif 10 IP adresi
-    ip_stats = list(
-        Log.objects.values('source_ip')
-        .annotate(count=Count('source_ip'))
-        .order_by('-count')[:10]
-    )
-    
-    # Saatlik dağılım (son 24 saat)
-    now = timezone.now()
-    hourly_data = []
-    for i in range(24):
-        hour_start = now - timedelta(hours=i+1)
-        hour_end = now - timedelta(hours=i)
-        count = Log.objects.filter(
-            receive_time__gte=hour_start,
-            receive_time__lt=hour_end
-        ).count()
-        hourly_data.append({
-            'hour': hour_start.strftime('%H:00'),
-            'count': count
-        })
-    
-    hourly_data.reverse()  # Cronological order
-    
-    # En sık karşılaşılan tehditler (Top 10)
-    threat_stats = list(
-        Log.objects.values('threat')
-        .annotate(count=Count('threat'))
-        .order_by('-count')[:10]
-    )
-    
-    # Type dağılımı
-    type_stats = dict(Log.objects.values('type').annotate(count=Count('type')))
-    
-    # Son 7 günün günlük log sayıları
-    daily_data = []
-    for i in range(7):
-        day_start = (now - timedelta(days=i)).replace(hour=0, minute=0, second=0, microsecond=0)
-        day_end = day_start + timedelta(days=1)
-        count = Log.objects.filter(
-            receive_time__gte=day_start,
-            receive_time__lt=day_end
-        ).count()
-        daily_data.append({
-            'date': day_start.strftime('%d.%m'),
-            'count': count
-        })
-    
-    daily_data.reverse()  # Chronological order
-    
-    # Son 24 saatteki log sayısı
-    last_24h_start = now - timedelta(hours=24)
-    last_24h_count = Log.objects.filter(receive_time__gte=last_24h_start).count()
-    
-    # En aktif IP'ler (sadece IP ve sayı)
-    top_ips = list(
-        Log.objects.values('source_ip')
-        .annotate(count=Count('source_ip'))
-        .order_by('-count')[:5]
-        .values_list('source_ip', 'count')
-    )
-    
-    stats_data = {
-        'total_logs': total_logs,
-        'severity_stats': severity_stats,
-        'ip_stats': ip_stats,
-        'hourly_stats': hourly_data,
-        'threat_stats': threat_stats,
-        'type_stats': type_stats,
-        'daily_stats': daily_data,
-        'top_ips': top_ips,
-        'last_24h_count': last_24h_count
-    }
-    
-    serializer = StatsSerializer(stats_data)
-    return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
