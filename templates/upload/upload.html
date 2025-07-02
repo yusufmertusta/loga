@@ -1,0 +1,530 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}CSV Yükleme - Log Analyzer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold text-primary mb-1">
+                        <i class="fas fa-upload me-2"></i>
+                        CSV Dosya Yükleme
+                    </h2>
+                    <p class="text-muted mb-0">Log verilerinizi CSV formatında sisteme yükleyin</p>
+                </div>
+                <div>
+                    <a href="/logs/" class="btn btn-outline-primary">
+                        <i class="fas fa-list me-2"></i>
+                        Log Kayıtlarını Görüntüle
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Upload Form -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="fas fa-file-csv me-2"></i>
+                        Dosya Yükleme
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <label for="csvFile" class="form-label fw-semibold">
+                                <i class="fas fa-paperclip me-2"></i>
+                                CSV Dosyası Seçin
+                            </label>
+                            <input type="file" class="form-control form-control-lg" id="csvFile" name="file" accept=".csv" required>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Maksimum dosya boyutu: 10MB
+                            </div>
+                            <div class="invalid-feedback" id="fileError"></div>
+                        </div>
+                        
+                        <!-- Drag & Drop Area -->
+                        <div class="mb-4">
+                            <div class="upload-area border-2 border-dashed rounded-3 p-5 text-center" id="uploadArea">
+                                <div class="upload-content">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                                    <h5 class="fw-bold text-primary mb-2">Dosyayı buraya sürükleyip bırakın</h5>
+                                    <p class="text-muted mb-3">veya yukarıdaki "Dosya Seç" butonunu kullanın</p>
+                                    <div class="text-muted small">
+                                        <i class="fas fa-check-circle text-success me-1"></i>
+                                        Desteklenen format: .csv
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Preview Section -->
+                        <div class="mb-4" id="previewSection" style="display: none;">
+                            <label class="form-label fw-semibold">
+                                <i class="fas fa-eye me-2"></i>
+                                Dosya Önizleme
+                            </label>
+                            <div class="border rounded-3 p-3 bg-light">
+                                <div class="row mb-2">
+                                    <div class="col-md-6">
+                                        <strong>Dosya Adı:</strong> <span id="fileName">-</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Dosya Boyutu:</strong> <span id="fileSize">-</span>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered mb-0">
+                                        <thead class="table-dark">
+                                            <tr id="previewHeaders"></tr>
+                                        </thead>
+                                        <tbody id="previewRows"></tbody>
+                                    </table>
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        İlk 3 satır görüntüleniyor
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg" id="uploadButton" disabled>
+                                <i class="fas fa-upload me-2"></i>
+                                <span id="uploadButtonText">Dosya Yükle</span>
+                                <span class="spinner-border spinner-border-sm ms-2" id="uploadSpinner" style="display: none;"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Info Panel -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-info text-white py-3">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="fas fa-question-circle me-2"></i>
+                        CSV Format Bilgisi
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">CSV dosyanız aşağıdaki sütunları içermelidir:</p>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Sütun Adı</th>
+                                    <th>Açıklama</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>receive_time</code></td>
+                                    <td>Log tarihi ve saati</td>
+                                </tr>
+                                <tr>
+                                    <td><code>type</code></td>
+                                    <td>Log türü</td>
+                                </tr>
+                                <tr>
+                                    <td><code>severity</code></td>
+                                    <td>Önem derecesi (low, medium, high, critical)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>threat</code></td>
+                                    <td>Tehdit açıklaması</td>
+                                </tr>
+                                <tr>
+                                    <td><code>source_ip</code></td>
+                                    <td>Kaynak IP adresi</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h6 class="fw-bold mb-3">
+                        <i class="fas fa-download me-2"></i>
+                        Örnek CSV İndir
+                    </h6>
+                    <p class="small text-muted mb-3">
+                        Doğru format için örnek CSV dosyasını indirebilirsiniz.
+                    </p>
+                    <button class="btn btn-outline-info btn-sm w-100" onclick="downloadSampleCSV()">
+                        <i class="fas fa-download me-2"></i>
+                        Örnek CSV İndir
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Upload History -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-success text-white py-3">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="fas fa-history me-2"></i>
+                        Son Yüklemeler
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="uploadHistory">
+                        <div class="text-center py-3">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                <span class="visually-hidden">Yükleniyor...</span>
+                            </div>
+                            <div class="mt-2 small">Geçmiş yükleniyor...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.upload-area {
+    border-color: #dee2e6;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+    border-color: #0d6efd;
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+.upload-area.dragover {
+    border-color: #0d6efd;
+    background-color: rgba(13, 110, 253, 0.1);
+    transform: scale(1.02);
+}
+
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
+#previewSection .table {
+    font-size: 0.85rem;
+}
+
+#previewSection .table th,
+#previewSection .table td {
+    padding: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+.upload-progress {
+    transition: all 0.3s ease;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auth kontrolü
+    checkAuthenticationAndRedirect();
+    
+    // Upload history yükle
+    loadUploadHistory();
+    
+    const uploadForm = document.getElementById('uploadForm');
+    const csvFile = document.getElementById('csvFile');
+    const uploadArea = document.getElementById('uploadArea');
+    const uploadButton = document.getElementById('uploadButton');
+    const uploadSpinner = document.getElementById('uploadSpinner');
+    const uploadButtonText = document.getElementById('uploadButtonText');
+    const previewSection = document.getElementById('previewSection');
+    
+    // File input change event
+    csvFile.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            handleFileSelect(e.target.files[0]);
+        }
+    });
+    
+    // Drag & Drop events
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+    });
+    
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+    });
+    
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            csvFile.files = files;
+            handleFileSelect(files[0]);
+        }
+    });
+    
+    // Form submit
+    uploadForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const file = csvFile.files[0];
+        if (!file) {
+            showAlert('warning', 'Lütfen bir CSV dosyası seçin.');
+            return;
+        }
+        
+        setLoadingState(true);
+        
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const token = localStorage.getItem('access_token');
+            const response = await fetch('/api/upload/', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                showAlert('success', `Dosya başarıyla yüklendi! ${data.processed_count} kayıt işlendi.`);
+                
+                // Form'u temizle
+                uploadForm.reset();
+                previewSection.style.display = 'none';
+                uploadButton.disabled = true;
+                
+                // Upload history'yi yenile
+                loadUploadHistory();
+                
+                // 3 saniye sonra logs sayfasına yönlendir
+                setTimeout(() => {
+                    if (confirm('Log kayıtlarını görüntülemek ister misiniz?')) {
+                        window.location.href = '/logs/';
+                    }
+                }, 2000);
+                
+            } else {
+                showAlert('danger', data.error || 'Dosya yüklenirken hata oluştu.');
+            }
+            
+        } catch (error) {
+            console.error('Upload error:', error);
+            showAlert('danger', 'Dosya yüklenirken bağlantı hatası oluştu.');
+        } finally {
+            setLoadingState(false);
+        }
+    });
+});
+
+function handleFileSelect(file) {
+    // Dosya türü kontrolü
+    if (!file.name.toLowerCase().endsWith('.csv')) {
+        showAlert('warning', 'Lütfen sadece CSV dosyası seçin.');
+        return;
+    }
+    
+    // Dosya boyutu kontrolü (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+        showAlert('warning', 'Dosya boyutu 10MB\'dan büyük olamaz.');
+        return;
+    }
+    
+    // Dosya bilgilerini göster
+    document.getElementById('fileName').textContent = file.name;
+    document.getElementById('fileSize').textContent = formatFileSize(file.size);
+    
+    // CSV önizleme
+    previewCSV(file);
+    
+    // Upload butonunu aktifleştir
+    document.getElementById('uploadButton').disabled = false;
+}
+
+function previewCSV(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const csv = e.target.result;
+        const lines = csv.split('\n');
+        
+        if (lines.length < 2) {
+            showAlert('warning', 'CSV dosyası en az 2 satır içermelidir (başlık + veri).');
+            return;
+        }
+        
+        // Başlıklar
+        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+        const headersRow = document.getElementById('previewHeaders');
+        headersRow.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
+        
+        // İlk 3 veri satırı
+        const previewRows = document.getElementById('previewRows');
+        previewRows.innerHTML = '';
+        
+        for (let i = 1; i <= Math.min(3, lines.length - 1); i++) {
+            if (lines[i].trim()) {
+                const cells = lines[i].split(',').map(c => c.trim().replace(/"/g, ''));
+                const row = document.createElement('tr');
+                row.innerHTML = cells.map(c => {
+                    const truncated = c.length > 20 ? c.substring(0, 20) + '...' : c;
+                    return `<td title="${c}">${truncated}</td>`;
+                }).join('');
+                previewRows.appendChild(row);
+            }
+        }
+        
+        // Gerekli sütunları kontrol et
+        validateCSVHeaders(headers);
+        
+        // Önizleme bölümünü göster
+        document.getElementById('previewSection').style.display = 'block';
+    };
+    
+    reader.readAsText(file);
+}
+
+function validateCSVHeaders(headers) {
+    const requiredHeaders = ['receive_time', 'type', 'severity', 'threat', 'source_ip'];
+    const missingHeaders = requiredHeaders.filter(h => !headers.some(header => 
+        header.toLowerCase().includes(h.toLowerCase())
+    ));
+    
+    if (missingHeaders.length > 0) {
+        showAlert('warning', `CSV dosyasında eksik sütunlar: ${missingHeaders.join(', ')}`);
+    } else {
+        showAlert('success', 'CSV format kontrolü başarılı!');
+    }
+}
+
+function setLoadingState(loading) {
+    const uploadButton = document.getElementById('uploadButton');
+    const uploadSpinner = document.getElementById('uploadSpinner');
+    const uploadButtonText = document.getElementById('uploadButtonText');
+    
+    uploadButton.disabled = loading;
+    uploadSpinner.style.display = loading ? 'inline-block' : 'none';
+    uploadButtonText.textContent = loading ? 'Yükleniyor...' : 'Dosya Yükle';
+}
+
+async function loadUploadHistory() {
+    try {
+        const token = localStorage.getItem('access_token');
+        const response = await fetch('/api/upload-history/', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const history = await response.json();
+            updateUploadHistory(history);
+        }
+    } catch (error) {
+        console.error('Upload history error:', error);
+        document.getElementById('uploadHistory').innerHTML = `
+            <div class="text-center py-3 text-muted">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Geçmiş yüklenemedi
+            </div>
+        `;
+    }
+}
+
+function updateUploadHistory(history) {
+    const container = document.getElementById('uploadHistory');
+    
+    if (!history || history.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-3 text-muted">
+                <i class="fas fa-inbox me-2"></i>
+                Henüz dosya yüklememişsiniz
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = history.slice(0, 5).map(item => `
+        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+            <div class="flex-grow-1">
+                <div class="fw-semibold text-truncate" style="max-width: 200px;" title="${item.filename}">
+                    <i class="fas fa-file-csv me-2 text-success"></i>
+                    ${item.filename}
+                </div>
+                <small class="text-muted">${item.upload_time_formatted}</small>
+            </div>
+            <div class="text-end">
+                <div class="badge ${item.success ? 'bg-success' : 'bg-danger'} mb-1">
+                    ${item.success ? 'Başarılı' : 'Hatalı'}
+                </div>
+                <div><small class="text-muted">${item.record_count} kayıt</small></div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function downloadSampleCSV() {
+    const sampleData = `receive_time,type,severity,threat,source_ip
+2025-06-24 07:34:42,vulnerability,medium,Nmap Scripting Engine Detection,185.67.33.193
+2025-06-24 07:32:37,vulnerability,critical,Realtek SDK RCE,144.172.91.97
+2025-06-24 07:30:15,intrusion,high,SQL Injection Attempt,192.168.1.100
+2025-06-24 07:28:45,malware,critical,Trojan.Win32.Agent,10.0.0.50
+2025-06-24 07:25:12,vulnerability,low,Directory Traversal,172.16.0.25`;
+    
+    const blob = new Blob([sampleData], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'sample_logs.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    showAlert('success', 'Örnek CSV dosyası indirildi.');
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function checkAuthenticationAndRedirect() {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        window.location.href = '/login/';
+        return;
+    }
+}
+</script>
+{% endblock %}

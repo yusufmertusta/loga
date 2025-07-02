@@ -1,0 +1,575 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Log Kayıtları - Log Analyzer{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold text-primary mb-1">
+                        <i class="fas fa-list me-2"></i>
+                        Log Kayıtları
+                    </h2>
+                    <p class="text-muted mb-0">Sistemdeki tüm güvenlik log kayıtlarını görüntüleyin ve filtreleyin</p>
+                </div>
+                <div>
+                    <a href="/upload/" class="btn btn-primary">
+                        <i class="fas fa-upload me-2"></i>
+                        Yeni CSV Yükle
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filter Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light border-bottom-0 py-3">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="fas fa-filter me-2"></i>
+                        Filtreler ve Arama
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="filterForm">
+                        <div class="row g-3">
+                            <!-- Arama -->
+                            <div class="col-md-4">
+                                <label for="searchInput" class="form-label fw-semibold">
+                                    <i class="fas fa-search me-1"></i>
+                                    Arama
+                                </label>
+                                <input type="text" class="form-control" id="searchInput" placeholder="Tehdit, IP veya tip ara...">
+                            </div>
+                            
+                            <!-- Severity Filtresi -->
+                            <div class="col-md-2">
+                                <label for="severityFilter" class="form-label fw-semibold">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    Önem Derecesi
+                                </label>
+                                <select class="form-select" id="severityFilter">
+                                    <option value="">Tümü</option>
+                                    <option value="low">Düşük</option>
+                                    <option value="medium">Orta</option>
+                                    <option value="high">Yüksek</option>
+                                    <option value="critical">Kritik</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Başlangıç Tarihi -->
+                            <div class="col-md-2">
+                                <label for="dateFrom" class="form-label fw-semibold">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    Başlangıç
+                                </label>
+                                <input type="date" class="form-control" id="dateFrom">
+                            </div>
+                            
+                            <!-- Bitiş Tarihi -->
+                            <div class="col-md-2">
+                                <label for="dateTo" class="form-label fw-semibold">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    Bitiş
+                                </label>
+                                <input type="date" class="form-control" id="dateTo">
+                            </div>
+                            
+                            <!-- Filter Butonları -->
+                            <div class="col-md-2 d-flex align-items-end">
+                                <div class="btn-group w-100" role="group">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" onclick="clearFilters()">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Results Info -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted">
+                        <span id="resultCount">-</span> kayıt bulundu
+                        <span id="filterInfo" class="ms-2"></span>
+                    </span>
+                </div>
+                <div>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-secondary" onclick="refreshLogs()">
+                            <i class="fas fa-sync-alt me-1"></i>
+                            Yenile
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" onclick="exportLogs()">
+                            <i class="fas fa-download me-1"></i>
+                            Dışa Aktar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Logs Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th style="width: 150px;">Tarih/Saat</th>
+                                    <th style="width: 100px;">Önem</th>
+                                    <th style="width: 120px;">Tip</th>
+                                    <th style="width: 140px;">Kaynak IP</th>
+                                    <th>Tehdit Açıklaması</th>
+                                    <th style="width: 120px;">Yükleyen</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logsTableBody">
+                                <tr>
+                                    <td colspan="6" class="text-center py-5">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Yükleniyor...</span>
+                                        </div>
+                                        <div class="mt-2">Log kayıtları yükleniyor...</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <nav aria-label="Sayfa navigasyonu">
+                <ul class="pagination justify-content-center" id="pagination">
+                    <!-- Pagination butonları JavaScript ile oluşturulacak -->
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Log Detail Modal -->
+<div class="modal fade" id="logDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Log Detayları
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="logDetailContent">
+                <!-- Modal content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.table th {
+    background-color: #495057;
+    color: white;
+    border: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.table td {
+    vertical-align: middle;
+    border-color: #dee2e6;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0,0,0,0.075);
+    cursor: pointer;
+}
+
+.badge-severity {
+    font-size: 0.8em;
+    padding: 0.4em 0.8em;
+}
+
+.pagination .page-link {
+    color: #495057;
+    border: 1px solid #dee2e6;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.table-responsive {
+    max-height: 70vh;
+}
+
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentPage = 1;
+let totalPages = 1;
+let currentFilters = {};
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Auth kontrolü
+    checkAuthenticationAndRedirect();
+    
+    // İlk yükleme
+    loadLogs();
+    
+    // Filter form submit
+    document.getElementById('filterForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        currentPage = 1;
+        loadLogs();
+    });
+    
+    // Enter tuşu ile arama
+    document.getElementById('searchInput').addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') {
+            currentPage = 1;
+            loadLogs();
+        }
+    });
+});
+
+async function loadLogs() {
+    try {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            window.location.href = '/login/';
+            return;
+        }
+        
+        // Filter parametrelerini topla
+        const filters = {
+            page: currentPage,
+            search: document.getElementById('searchInput').value,
+            severity: document.getElementById('severityFilter').value,
+            date_from: document.getElementById('dateFrom').value,
+            date_to: document.getElementById('dateTo').value
+        };
+        
+        // Boş parametreleri kaldır
+        Object.keys(filters).forEach(key => {
+            if (!filters[key]) delete filters[key];
+        });
+        
+        currentFilters = filters;
+        
+        // URL parametrelerini oluştur
+        const params = new URLSearchParams(filters);
+        
+        const response = await fetch(`/api/logs/?${params}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            updateLogsTable(data.results);
+            updatePagination(data);
+            updateResultCount(data.count);
+            updateFilterInfo();
+        } else {
+            throw new Error('Logs yüklenemedi');
+        }
+        
+    } catch (error) {
+        console.error('Load logs error:', error);
+        showAlert('danger', 'Log kayıtları yüklenirken hata oluştu.');
+        
+        document.getElementById('logsTableBody').innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center py-5 text-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Veriler yüklenirken hata oluştu.
+                </td>
+            </tr>
+        `;
+    }
+}
+
+function updateLogsTable(logs) {
+    const tbody = document.getElementById('logsTableBody');
+    
+    if (!logs || logs.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center py-5 text-muted">
+                    <i class="fas fa-inbox me-2"></i>
+                    Filtrelere uygun log kaydı bulunamadı.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = logs.map(log => {
+        const severityBadge = getSeverityBadge(log.severity);
+        const date = new Date(log.receive_time).toLocaleString('tr-TR');
+        const threat = log.threat.length > 80 ? log.threat.substring(0, 80) + '...' : log.threat;
+        
+        return `
+            <tr onclick="showLogDetail(${log.id})" style="cursor: pointer;">
+                <td class="fw-semibold">
+                    <small>${date}</small>
+                </td>
+                <td>${severityBadge}</td>
+                <td>
+                    <span class="badge bg-info text-dark">${log.type}</span>
+                </td>
+                <td>
+                    <code class="text-primary">${log.source_ip}</code>
+                </td>
+                <td>
+                    <span title="${log.threat}">${threat}</span>
+                </td>
+                <td>
+                    <small class="text-muted">${log.uploaded_by_username}</small>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function updatePagination(data) {
+    const pagination = document.getElementById('pagination');
+    const totalCount = data.count;
+    const pageSize = data.results.length > 0 ? Math.ceil(totalCount / Math.ceil(totalCount / data.results.length)) : 50;
+    totalPages = Math.ceil(totalCount / pageSize);
+    
+    if (totalPages <= 1) {
+        pagination.innerHTML = '';
+        return;
+    }
+    
+    let paginationHTML = '';
+    
+    // Previous button
+    paginationHTML += `
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+        </li>
+    `;
+    
+    // Page numbers
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, currentPage + 2);
+    
+    if (startPage > 1) {
+        paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(1)">1</a></li>`;
+        if (startPage > 2) {
+            paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        paginationHTML += `
+            <li class="page-item ${i === currentPage ? 'active' : ''}">
+                <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+            </li>
+        `;
+    }
+    
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+        paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${totalPages})">${totalPages}</a></li>`;
+    }
+    
+    // Next button
+    paginationHTML += `
+        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        </li>
+    `;
+    
+    pagination.innerHTML = paginationHTML;
+}
+
+function changePage(page) {
+    if (page >= 1 && page <= totalPages && page !== currentPage) {
+        currentPage = page;
+        loadLogs();
+    }
+}
+
+function updateResultCount(count) {
+    document.getElementById('resultCount').textContent = count.toLocaleString('tr-TR');
+}
+
+function updateFilterInfo() {
+    const filterInfo = document.getElementById('filterInfo');
+    const activeFilters = [];
+    
+    if (currentFilters.search) {
+        activeFilters.push(`Arama: "${currentFilters.search}"`);
+    }
+    if (currentFilters.severity) {
+        const severityNames = {
+            'low': 'Düşük',
+            'medium': 'Orta',
+            'high': 'Yüksek',
+            'critical': 'Kritik'
+        };
+        activeFilters.push(`Önem: ${severityNames[currentFilters.severity]}`);
+    }
+    if (currentFilters.date_from || currentFilters.date_to) {
+        let dateFilter = 'Tarih: ';
+        if (currentFilters.date_from && currentFilters.date_to) {
+            dateFilter += `${currentFilters.date_from} - ${currentFilters.date_to}`;
+        } else if (currentFilters.date_from) {
+            dateFilter += `${currentFilters.date_from} sonrası`;
+        } else {
+            dateFilter += `${currentFilters.date_to} öncesi`;
+        }
+        activeFilters.push(dateFilter);
+    }
+    
+    if (activeFilters.length > 0) {
+        filterInfo.innerHTML = `<span class="text-primary">(${activeFilters.join(', ')})</span>`;
+    } else {
+        filterInfo.innerHTML = '';
+    }
+}
+
+function getSeverityBadge(severity) {
+    const badges = {
+        'low': '<span class="badge bg-success badge-severity">Düşük</span>',
+        'medium': '<span class="badge bg-warning text-dark badge-severity">Orta</span>',
+        'high': '<span class="badge bg-danger badge-severity">Yüksek</span>',
+        'critical': '<span class="badge bg-dark badge-severity">Kritik</span>'
+    };
+    return badges[severity] || `<span class="badge bg-secondary badge-severity">${severity}</span>`;
+}
+
+async function showLogDetail(logId) {
+    try {
+        const token = localStorage.getItem('access_token');
+        const response = await fetch(`/api/logs/?search=${logId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            const log = data.results.find(l => l.id === logId);
+            
+            if (log) {
+                const modalContent = document.getElementById('logDetailContent');
+                modalContent.innerHTML = `
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <strong>Tarih/Saat:</strong><br>
+                            <span class="text-muted">${new Date(log.receive_time).toLocaleString('tr-TR')}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Önem Derecesi:</strong><br>
+                            ${getSeverityBadge(log.severity)}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Log Tipi:</strong><br>
+                            <span class="badge bg-info text-dark">${log.type}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Kaynak IP:</strong><br>
+                            <code class="text-primary">${log.source_ip}</code>
+                        </div>
+                        <div class="col-12">
+                            <strong>Tehdit Açıklaması:</strong><br>
+                            <div class="bg-light p-3 rounded mt-2">
+                                ${log.threat}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Yükleyen Kullanıcı:</strong><br>
+                            <span class="text-muted">${log.uploaded_by_username}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Sisteme Eklenme:</strong><br>
+                            <span class="text-muted">${new Date(log.created_at).toLocaleString('tr-TR')}</span>
+                        </div>
+                    </div>
+                `;
+                
+                const modal = new bootstrap.Modal(document.getElementById('logDetailModal'));
+                modal.show();
+            }
+        }
+    } catch (error) {
+        console.error('Log detail error:', error);
+        showAlert('danger', 'Log detayları yüklenirken hata oluştu.');
+    }
+}
+
+function clearFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('severityFilter').value = '';
+    document.getElementById('dateFrom').value = '';
+    document.getElementById('dateTo').value = '';
+    currentPage = 1;
+    loadLogs();
+}
+
+function refreshLogs() {
+    loadLogs();
+    showAlert('success', 'Log kayıtları yenilendi.');
+}
+
+function exportLogs() {
+    // Bu fonksiyon gelecekte CSV export için kullanılabilir
+    showAlert('info', 'Dışa aktarma özelliği yakında eklenecek.');
+}
+
+function checkAuthenticationAndRedirect() {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        window.location.href = '/login/';
+        return;
+    }
+}
+</script>
+{% endblock %}

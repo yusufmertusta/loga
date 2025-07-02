@@ -1,0 +1,784 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ana Sayfa - Log Analyzer{% endblock %}
+
+{% block content %}
+<div class="container" >
+    <!-- Hero Section -->
+    <section class="hero-section py-5">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-6">
+                <div class="hero-content animate-fade-in">
+                    <div class="hero-badge mb-4">
+                        <span class="badge bg-gradient text-white px-4 py-2 rounded-pill">
+                            <i class="fas fa-rocket me-2"></i>Yeni Nesil Güvenlik Analizi
+                        </span>
+                    </div>
+                    
+                    <h1 class="display-3 fw-bold text-white mb-4">
+                        <span class="text-gradient">Log Analyzer</span>
+                        <br>
+                        <span class="text-white-75">Güvenlik Analiz Platformu</span>
+                    </h1>
+                    
+                    <p class="lead text-white-75 mb-5 fs-5">
+                        Log analizi ile güvenlik tehditlerini tespit edin, 
+                        gerçek zamanlı izleme yapın ve kapsamlı raporlar alın. 
+                        Modern dashboard ile verilerinizi görselleştirin.
+                    </p>
+                    
+                    <div class="hero-actions d-flex gap-3 flex-wrap mb-5">
+                        <a href="/login/" class="btn btn-primary btn-lg px-5 py-3 animate-glow" id="loginBtn">
+                            <i class="fas fa-sign-in-alt me-2"></i>
+                            Hemen Başla
+                        </a>
+                        <a href="/register/" class="btn btn-outline-light btn-lg px-5 py-3" id="registerBtn">
+                            <i class="fas fa-user-plus me-2"></i>
+                            Ücretsiz Kayıt
+                        </a>
+                        <a href="/dashboard/" class="btn btn-success btn-lg px-5 py-3 animate-glow" id="dashboardBtn" style="display: none;">
+                            <i class="fas fa-tachometer-alt me-2"></i>
+                            Dashboard'a Git
+                        </a>
+                    </div>
+                    
+                    <div class="hero-stats row text-center">
+                        <div class="col-4">
+                            <div class="stat-item">
+                                <h3 class="fw-bold text-white mb-1">99.9%</h3>
+                                <small class="text-white-50">Doğruluk</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-item">
+                                <h3 class="fw-bold text-white mb-1">24/7</h3>
+                                <small class="text-white-50">İzleme</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-item">
+                                <h3 class="fw-bold text-white mb-1">< 1ms</h3>
+                                <small class="text-white-50">Analiz</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="hero-visual animate-slide-in">
+                    <div class="dashboard-preview">
+                        <div class="preview-window">
+                            <div class="window-header">
+                                <div class="window-controls">
+                                    <span class="control control-close"></span>
+                                    <span class="control control-minimize"></span>
+                                    <span class="control control-maximize"></span>
+                                </div>
+                                <div class="window-title">Log Analyzer Dashboard</div>
+                            </div>
+                            <div class="window-content">
+                                <div class="preview-grid">
+                                    <div class="preview-card">
+                                        <div class="card-icon bg-primary">
+                                            <i class="fas fa-shield-alt"></i>
+                                        </div>
+                                        <div class="card-content">
+                                            <h6>Aktif Tehditler</h6>
+                                            <h4>23</h4>
+                                        </div>
+                                    </div>
+                                    <div class="preview-card">
+                                        <div class="card-icon bg-success">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                        <div class="card-content">
+                                            <h6>Güvenli Bağlantı</h6>
+                                            <h4>1.2K</h4>
+                                        </div>
+                                    </div>
+                                    <div class="preview-card">
+                                        <div class="card-icon bg-warning">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </div>
+                                        <div class="card-content">
+                                            <h6>Şüpheli Aktivite</h6>
+                                            <h4>7</h4>
+                                        </div>
+                                    </div>
+                                    <div class="preview-card">
+                                        <div class="card-icon bg-info">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <div class="card-content">
+                                            <h6>Analiz Oranı</h6>
+                                            <h4>95%</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="preview-chart">
+                                    <div class="chart-header">
+                                        <h6>Gerçek Zamanlı Threat Analysis</h6>
+                                    </div>
+                                    <div class="chart-area">
+                                        <svg viewBox="0 0 300 100">
+                                            <polyline points="0,50 30,30 60,70 90,20 120,40 150,10 180,30 210,60 240,25 270,45 300,35" 
+                                                     fill="none" 
+                                                     stroke="url(#gradient)" 
+                                                     stroke-width="3">
+                                                <animate attributeName="stroke-dasharray" 
+                                                        values="0,1000;1000,0" 
+                                                        dur="3s" 
+                                                        repeatCount="indefinite"/>
+                                            </polyline>
+                                            <defs>
+                                                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                    <stop offset="0%" style="stop-color:#667eea"/>
+                                                    <stop offset="100%" style="stop-color:#764ba2"/>
+                                                </linearGradient>
+                                            </defs>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Floating Elements -->
+                        <div class="floating-element element-1">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="floating-element element-2">
+                            <i class="fas fa-wifi"></i>
+                        </div>
+                        <div class="floating-element element-3">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <div class="floating-element element-4">
+                            <i class="fas fa-database"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section class="features-section py-5">
+        <div class="container">
+            <div class="section-header text-center mb-5">
+                <h2 class="display-4 fw-bold text-white mb-4">
+                    Güçlü Özellikler
+                </h2>
+                <p class="lead text-white-75 mx-auto" style="max-width: 600px;">
+                    Modern teknolojiler ve yapay zeka desteği ile log analizinizi 
+                    bir üst seviyeye taşıyın
+                </p>
+            </div>
+            
+            <div class="row g-4" style="color: #e2e8f0;">
+               
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card h-100">
+                        <div class="feature-icon mb-4">
+                            <i class="fas fa-tachometer-alt fa-2x"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3">Real-time Monitoring</h5>
+                        <p class="text-muted mb-4">
+                            Gerçek zamanlı log izleme ve anında alarm sistemi. 
+                            Kritik olayları kaçırmayın, hemen harekete geçin.
+                        </p>
+                        <div class="feature-badges">
+                            <span class="badge bg-success me-2">< 100ms</span>
+                            <span class="badge bg-info">24/7 Active</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card h-100">
+                        <div class="feature-icon mb-4">
+                            <i class="fas fa-chart-pie fa-2x"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3">Advanced Visualization</h5>
+                        <p class="text-muted mb-4">
+                            İnteraktif grafikler ve dashboard'lar ile verilerinizi 
+                            görselleştirin. Chart.js ile dinamik raporlama.
+                        </p>
+                        <div class="feature-chart">
+                            <div class="mini-chart">
+                                <div class="chart-bar" style="height: 60%"></div>
+                                <div class="chart-bar" style="height: 80%"></div>
+                                <div class="chart-bar" style="height: 40%"></div>
+                                <div class="chart-bar" style="height: 90%"></div>
+                                <div class="chart-bar" style="height: 70%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card h-100">
+                        <div class="feature-icon mb-4">
+                            <i class="fas fa-cloud-upload-alt fa-2x"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3">Easy CSV Upload</h5>
+                        <p class="text-muted mb-4">
+                            Drag & drop ile kolay dosya yükleme. Büyük CSV dosyalarını 
+                            hızla işleyin ve analiz edin.
+                        </p>
+                        <div class="upload-demo">
+                            <div class="upload-area-mini">
+                                <i class="fas fa-file-csv text-success"></i>
+                                <span>Drag & Drop Ready</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card h-100">
+                        <div class="feature-icon mb-4">
+                            <i class="fas fa-shield-alt fa-2x"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3">Enterprise Security</h5>
+                        <p class="text-muted mb-4">
+                            JWT token tabanlı güvenlik, rol bazlı erişim kontrolü 
+                            ve şifrelenmiş veri saklama.
+                        </p>
+                        <div class="security-indicators">
+                            <span class="indicator active"></span>
+                            <span class="indicator active"></span>
+                            <span class="indicator active"></span>
+                            <span class="indicator"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card h-100">
+                        <div class="feature-icon mb-4">
+                            <i class="fas fa-mobile-alt fa-2x"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3">Responsive Design</h5>
+                        <p class="text-muted mb-4">
+                            Her cihazda mükemmel deneyim. Mobil-first tasarım 
+                            anlayışı ile her yerden erişim.
+                        </p>
+                        <div class="device-mockup">
+                            <div class="device desktop"></div>
+                            <div class="device tablet"></div>
+                            <div class="device mobile"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Stats Section -->
+    <section class="stats-section py-5">
+        <div class="container">
+            <div class="stats-container">
+                <div class="row text-center">
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-number" data-count="10000">0</div>
+                            <div class="stat-label">Aktif Kullanıcı</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div class="stat-number" data-count="5000000">0</div>
+                            <div class="stat-label">İşlenen Log</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="stat-number" data-count="50000">0</div>
+                            <div class="stat-label">Engellenen Tehdit</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-number" data-count="99">0</div>
+                            <div class="stat-label">% Uptime</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta-section py-5">
+        <div class="container">
+            <div class="cta-container text-center">
+                <div class="cta-content">
+                    <h2 class="display-4 fw-bold text-white mb-4">
+                        Güvenliğinizi Bir Sonraki Seviyeye Taşıyın
+                    </h2>
+                    <p class="lead text-white-75 mb-5 mx-auto" style="max-width: 600px;">
+                        Hemen başlayın ve log analizinizi otomatikleştirin. 
+                        Ücretsiz hesap açın ve premium özellikleri keşfedin.
+                    </p>
+                    <div class="cta-actions">
+                        <a href="/register/" class="btn btn-primary btn-lg px-5 py-3 me-3 animate-glow">
+                            <i class="fas fa-rocket me-2"></i>
+                            Ücretsiz Başla
+                        </a>
+                        <a href="/demo/" class="btn btn-outline-light btn-lg px-5 py-3">
+                            <i class="fas fa-play me-2"></i>
+                            Demo İzle
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+    .text-white-75 {
+        color: rgba(255, 255, 255, 0.75) !important;
+    }
+    
+    .text-white-50 {
+        color: rgba(255, 255, 255, 0.5) !important;
+    }
+    
+    .text-gradient {
+        background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .hero-badge .badge {
+        background: rgba(255, 255, 255, 0.2) !important;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .dashboard-preview {
+        position: relative;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .preview-window {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 1rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        overflow: hidden;
+        transform: perspective(1000px) rotateY(-10deg) rotateX(5deg);
+        transition: transform 0.3s ease;
+    }
+    
+    .preview-window:hover {
+        transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+    }
+    
+    .window-header {
+        background: rgba(0, 0, 0, 0.8);
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .window-controls {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .control {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+    
+    .control-close {
+        background: #ff5f57;
+    }
+    
+    .control-minimize {
+        background: #ffbd2e;
+    }
+    
+    .control-maximize {
+        background: #28ca42;
+    }
+    
+    .window-title {
+        color: white;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    
+    .window-content {
+        padding: 1.5rem;
+    }
+    
+    .preview-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .preview-card {
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 0.75rem;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: transform 0.2s ease;
+    }
+    
+    .preview-card:hover {
+        transform: scale(1.05);
+    }
+    
+    .card-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1rem;
+    }
+    
+    .card-content h6 {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin: 0;
+    }
+    
+    .card-content h4 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0;
+        color: #1e293b;
+    }
+    
+    .preview-chart {
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 0.75rem;
+        padding: 1rem;
+    }
+    
+    .chart-header h6 {
+        color: #374151;
+        font-weight: 600;
+        margin: 0 0 1rem 0;
+        font-size: 0.875rem;
+    }
+    
+    .chart-area svg {
+        width: 100%;
+        height: 60px;
+    }
+    
+    .floating-element {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .element-1 {
+        top: 10%;
+        right: -10%;
+        animation-delay: 0s;
+    }
+    
+    .element-2 {
+        top: 50%;
+        left: -10%;
+        animation-delay: 2s;
+    }
+    
+    .element-3 {
+        bottom: 30%;
+        right: -5%;
+        animation-delay: 4s;
+    }
+    
+    .element-4 {
+        bottom: 10%;
+        left: -5%;
+        animation-delay: 1s;
+    }
+    
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+    
+    .feature-progress .progress {
+        height: 6px;
+        background: rgba(0, 0, 0, 0.1);
+    }
+    
+    .feature-badges .badge {
+        font-size: 0.7rem;
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .mini-chart {
+        display: flex;
+        align-items: end;
+        gap: 4px;
+        height: 40px;
+        justify-content: center;
+    }
+    
+    .chart-bar {
+        width: 8px;
+        background: var(--gradient-primary);
+        border-radius: 2px;
+        animation: chartGrow 2s ease-out;
+    }
+    
+    @keyframes chartGrow {
+        from {
+            height: 0;
+        }
+    }
+    
+    .upload-area-mini {
+        background: rgba(0, 0, 0, 0.05);
+        border: 2px dashed rgba(0, 0, 0, 0.1);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        text-align: center;
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+    
+    .security-indicators {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+    
+    .indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.1);
+    }
+    
+    .indicator.active {
+        background: var(--gradient-primary);
+    }
+    
+    .device-mockup {
+        display: flex;
+        align-items: end;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .device {
+        background: #374151;
+        border-radius: 2px;
+    }
+    
+    .device.desktop {
+        width: 30px;
+        height: 20px;
+    }
+    
+    .device.tablet {
+        width: 20px;
+        height: 25px;
+        border-radius: 3px;
+    }
+    
+    .device.mobile {
+        width: 12px;
+        height: 20px;
+        border-radius: 2px;
+    }
+    
+    .stats-container {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 2rem;
+        padding: 3rem 2rem;
+    }
+    
+    .stat-card {
+        text-align: center;
+    }
+    
+    .stat-icon {
+        width: 80px;
+        height: 80px;
+        background: var(--gradient-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: white;
+        font-size: 2rem;
+    }
+    
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 800;
+        color: white;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 0.875rem;
+    }
+    
+    .cta-container {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 2rem;
+        padding: 4rem 2rem;
+    }
+    
+    @media (max-width: 768px) {
+        .preview-window {
+            transform: none;
+        }
+        
+        .preview-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .floating-element {
+            display: none;
+        }
+        
+        .hero-actions {
+            flex-direction: column;
+        }
+        
+        .hero-actions .btn {
+            width: 100%;
+        }
+        
+        .cta-actions {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .cta-actions .btn {
+            width: 100%;
+            max-width: 300px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auth durumuna göre butonları göster/gizle
+    const token = localStorage.getItem('access_token');
+    const loginBtn = document.getElementById('loginBtn');
+    const registerBtn = document.getElementById('registerBtn');
+    const dashboardBtn = document.getElementById('dashboardBtn');
+    
+    if (token) {
+        loginBtn.style.display = 'none';
+        registerBtn.style.display = 'none';
+        dashboardBtn.style.display = 'inline-block';
+    } else {
+        loginBtn.style.display = 'inline-block';
+        registerBtn.style.display = 'inline-block';
+        dashboardBtn.style.display = 'none';
+    }
+    
+    // Counter animation
+    function animateCounter(element) {
+        const target = parseInt(element.dataset.count);
+        const duration = 2000;
+        const increment = target / (duration / 16);
+        let current = 0;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+            element.textContent = Math.floor(current).toLocaleString();
+        }, 16);
+    }
+    
+    // Intersection Observer for counters
+    const counterObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const counter = entry.target.querySelector('.stat-number');
+                if (counter && !counter.dataset.animated) {
+                    counter.dataset.animated = 'true';
+                    animateCounter(counter);
+                }
+            }
+        });
+    });
+    
+    document.querySelectorAll('.stat-card').forEach(card => {
+        counterObserver.observe(card);
+    });
+    
+    // Parallax effect for floating elements
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const elements = document.querySelectorAll('.floating-element');
+        
+        elements.forEach((element, index) => {
+            const speed = 0.5 + (index * 0.1);
+            element.style.transform = `translateY(${scrolled * speed}px)`;
+        });
+    });
+});
+</script>
+{% endblock %}

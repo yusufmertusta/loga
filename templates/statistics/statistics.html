@@ -1,0 +1,768 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}İstatistikler - Log Analyzer{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold text-primary mb-1">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Detaylı İstatistikler
+                    </h2>
+                    <p class="text-muted mb-0">Log verilerinizin kapsamlı analizi ve görselleştirmesi</p>
+                </div>
+                <div>
+                    <button class="btn btn-outline-primary me-2" onclick="refreshStats()">
+                        <i class="fas fa-sync-alt me-2"></i>
+                        Yenile
+                    </button>
+                    <button class="btn btn-primary" onclick="exportStats()">
+                        <i class="fas fa-download me-2"></i>
+                        Rapor İndir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 stats-card">
+                <div class="card-body text-center">
+                    <div class="stats-icon bg-primary bg-opacity-10 rounded-circle p-3 d-inline-flex mb-3">
+                        <i class="fas fa-database fa-2x text-primary"></i>
+                    </div>
+                    <h3 class="stats-number mb-1" id="totalLogsStats">-</h3>
+                    <p class="stats-label mb-0">Toplam Log Sayısı</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 stats-card">
+                <div class="card-body text-center">
+                    <div class="stats-icon bg-danger bg-opacity-10 rounded-circle p-3 d-inline-flex mb-3">
+                        <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
+                    </div>
+                    <h3 class="stats-number mb-1" id="criticalLogsStats">-</h3>
+                    <p class="stats-label mb-0">Kritik Seviye</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 stats-card">
+                <div class="card-body text-center">
+                    <div class="stats-icon bg-info bg-opacity-10 rounded-circle p-3 d-inline-flex mb-3">
+                        <i class="fas fa-network-wired fa-2x text-info"></i>
+                    </div>
+                    <h3 class="stats-number mb-1" id="uniqueIpsStats">-</h3>
+                    <p class="stats-label mb-0">Benzersiz IP</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 stats-card">
+                <div class="card-body text-center">
+                    <div class="stats-icon bg-success bg-opacity-10 rounded-circle p-3 d-inline-flex mb-3">
+                        <i class="fas fa-shield-alt fa-2x text-success"></i>
+                    </div>
+                    <h3 class="stats-number mb-1" id="threatTypesStats">-</h3>
+                    <p class="stats-label mb-0">Tehdit Türü</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chart Row 1 -->
+    <div class="row g-4 mb-4">
+        <!-- Severity Distribution (Pie Chart) -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-gradient-primary text-white py-3">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="fas fa-chart-pie me-2"></i>
+                        Önem Derecesi Dağılımı
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="severityPieChart"></canvas>
+                    </div>
+                    <div class="mt-3">
+                        <div class="row text-center">
+                            <div class="col-3">
+                                <small class="text-muted">Düşük</small>
+                                <div class="fw-bold text-success" id="lowCount">-</div>
+                            </div>
+                            <div class="col-3">
+                                <small class="text-muted">Orta</small>
+                                <div class="fw-bold text-warning" id="mediumCount">-</div>
+                            </div>
+                            <div class="col-3">
+                                <small class="text-muted">Yüksek</small>
+                                <div class="fw-bold text-danger" id="highCount">-</div>
+                            </div>
+                            <div class="col-3">
+                                <small class="text-muted">Kritik</small>
+                                <div class="fw-bold text-dark" id="criticalCount">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Top IP Addresses (Bar Chart) -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-gradient-info text-white py-3">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        En Aktif IP Adresleri
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="ipBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chart Row 2 -->
+    <div class="row g-4 mb-4">
+        <!-- Hourly Activity (Line Chart) -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-gradient-success text-white py-3">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Saatlik Aktivite Dağılımı (Son 24 Saat)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="hourlyLineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Threat Types (Doughnut Chart) -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-gradient-warning text-white py-3">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="fas fa-shield-virus me-2"></i>
+                        Tehdit Türleri
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="threatDoughnutChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chart Row 3 -->
+    <div class="row g-4 mb-4">
+        <!-- Daily Trend (Area Chart) -->
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient-danger text-white py-3">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="fas fa-chart-area me-2"></i>
+                        7 Günlük Trend Analizi
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="height: 400px;">
+                        <canvas id="dailyAreaChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Threats Table -->
+    <div class="row g-4">
+        <!-- Top Threats -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="fas fa-list-ol me-2"></i>
+                        En Sık Karşılaşılan Tehditler
+                    </h5>
+                    <span class="badge bg-light text-dark">Top 10</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 60px;">#</th>
+                                    <th>Tehdit Açıklaması</th>
+                                    <th style="width: 100px;">Sayı</th>
+                                    <th style="width: 150px;">Yüzde</th>
+                                </tr>
+                            </thead>
+                            <tbody id="topThreatsTable">
+                                <tr>
+                                    <td colspan="4" class="text-center py-4">
+                                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                            <span class="visually-hidden">Yükleniyor...</span>
+                                        </div>
+                                        <div class="mt-2">Veriler yükleniyor...</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-secondary text-white py-3">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Hızlı İstatistikler
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="quickStats">
+                        <div class="text-center py-4">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                <span class="visually-hidden">Yükleniyor...</span>
+                            </div>
+                            <div class="mt-2">Veriler yükleniyor...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.stats-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+.stats-icon {
+    width: 70px;
+    height: 70px;
+}
+
+.chart-container {
+    position: relative;
+    min-height: 300px;
+}
+
+.progress-custom {
+    height: 8px;
+    border-radius: 10px;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.bg-gradient-info {
+    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%) !important;
+}
+
+.bg-gradient-success {
+    background: linear-gradient(135deg, #55efc4 0%, #00b894 100%) !important;
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%) !important;
+}
+
+.bg-gradient-danger {
+    background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%) !important;
+}
+
+@media (max-width: 768px) {
+    .chart-container {
+        min-height: 250px;
+    }
+    
+    .stats-number {
+        font-size: 2rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let charts = {};
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Auth kontrolü
+    checkAuthenticationAndRedirect();
+    
+    // İstatistikleri yükle
+    loadStatistics();
+});
+
+async function loadStatistics() {
+    try {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            window.location.href = '/login/';
+            return;
+        }
+        
+        const response = await fetch('/api/stats/', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            updateSummaryCards(data);
+            createCharts(data);
+            updateTopThreats(data.threat_stats);
+            updateQuickStats(data);
+        } else {
+            throw new Error('İstatistikler yüklenemedi');
+        }
+        
+    } catch (error) {
+        console.error('Statistics load error:', error);
+        showAlert('danger', 'İstatistikler yüklenirken hata oluştu.');
+    }
+}
+
+function updateSummaryCards(data) {
+    document.getElementById('totalLogsStats').textContent = data.total_logs.toLocaleString('tr-TR');
+    document.getElementById('criticalLogsStats').textContent = (data.severity_stats.critical || 0).toLocaleString('tr-TR');
+    document.getElementById('uniqueIpsStats').textContent = data.ip_stats.length.toLocaleString('tr-TR');
+    document.getElementById('threatTypesStats').textContent = Object.keys(data.type_stats).length.toLocaleString('tr-TR');
+    
+    // Severity counts
+    document.getElementById('lowCount').textContent = (data.severity_stats.low || 0).toLocaleString('tr-TR');
+    document.getElementById('mediumCount').textContent = (data.severity_stats.medium || 0).toLocaleString('tr-TR');
+    document.getElementById('highCount').textContent = (data.severity_stats.high || 0).toLocaleString('tr-TR');
+    document.getElementById('criticalCount').textContent = (data.severity_stats.critical || 0).toLocaleString('tr-TR');
+}
+
+function createCharts(data) {
+    createSeverityPieChart(data.severity_stats);
+    createIPBarChart(data.ip_stats);
+    createHourlyLineChart(data.hourly_stats);
+    createThreatDoughnutChart(data.type_stats);
+    createDailyAreaChart(data.daily_stats);
+}
+
+function createSeverityPieChart(severityData) {
+    const ctx = document.getElementById('severityPieChart').getContext('2d');
+    
+    const labels = ['Düşük', 'Orta', 'Yüksek', 'Kritik'];
+    const data = [
+        severityData.low || 0,
+        severityData.medium || 0,
+        severityData.high || 0,
+        severityData.critical || 0
+    ];
+    const colors = ['#28a745', '#ffc107', '#fd7e14', '#dc3545'];
+    
+    if (charts.severityPie) charts.severityPie.destroy();
+    
+    charts.severityPie = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: colors,
+                borderWidth: 3,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        font: {
+                            weight: '500'
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createIPBarChart(ipData) {
+    const ctx = document.getElementById('ipBarChart').getContext('2d');
+    
+    const top10IPs = ipData.slice(0, 10);
+    const labels = top10IPs.map(item => item.source_ip);
+    const data = top10IPs.map(item => item.count);
+    
+    if (charts.ipBar) charts.ipBar.destroy();
+    
+    charts.ipBar = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Log Sayısı',
+                data: data,
+                backgroundColor: 'rgba(23, 162, 184, 0.8)',
+                borderColor: 'rgba(23, 162, 184, 1)',
+                borderWidth: 2,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                },
+                x: {
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createHourlyLineChart(hourlyData) {
+    const ctx = document.getElementById('hourlyLineChart').getContext('2d');
+    
+    const labels = hourlyData.map(item => item.hour);
+    const data = hourlyData.map(item => item.count);
+    
+    if (charts.hourlyLine) charts.hourlyLine.destroy();
+    
+    charts.hourlyLine = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Log Sayısı',
+                data: data,
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#28a745',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createThreatDoughnutChart(typeData) {
+    const ctx = document.getElementById('threatDoughnutChart').getContext('2d');
+    
+    const labels = Object.keys(typeData);
+    const data = Object.values(typeData);
+    const colors = [
+        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+        '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
+    ];
+    
+    if (charts.threatDoughnut) charts.threatDoughnut.destroy();
+    
+    charts.threatDoughnut = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: colors.slice(0, labels.length),
+                borderWidth: 3,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        usePointStyle: true,
+                        font: {
+                            size: 11
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createDailyAreaChart(dailyData) {
+    const ctx = document.getElementById('dailyAreaChart').getContext('2d');
+    
+    const labels = dailyData.map(item => item.date);
+    const data = dailyData.map(item => item.count);
+    
+    if (charts.dailyArea) charts.dailyArea.destroy();
+    
+    charts.dailyArea = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Günlük Log Sayısı',
+                data: data,
+                borderColor: '#fd7e14',
+                backgroundColor: 'rgba(253, 126, 20, 0.2)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#fd7e14',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 3,
+                pointRadius: 6,
+                pointHoverRadius: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        font: {
+                            weight: '500'
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    },
+                    grid: {
+                        color: 'rgba(0,0,0,0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(0,0,0,0.1)'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function updateTopThreats(threatStats) {
+    const tbody = document.getElementById('topThreatsTable');
+    
+    if (!threatStats || threatStats.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4" class="text-center py-4 text-muted">
+                    <i class="fas fa-inbox me-2"></i>
+                    Tehdit verisi bulunmuyor.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    const totalThreats = threatStats.reduce((sum, item) => sum + item.count, 0);
+    
+    tbody.innerHTML = threatStats.slice(0, 10).map((threat, index) => {
+        const percentage = ((threat.count / totalThreats) * 100).toFixed(1);
+        const truncatedThreat = threat.threat.length > 60 ? 
+            threat.threat.substring(0, 60) + '...' : threat.threat;
+        
+        return `
+            <tr>
+                <td class="text-center">
+                    <span class="badge bg-primary rounded-pill">${index + 1}</span>
+                </td>
+                <td>
+                    <div class="fw-semibold" title="${threat.threat}">
+                        ${truncatedThreat}
+                    </div>
+                </td>
+                <td class="text-center">
+                    <span class="badge bg-info">${threat.count}</span>
+                </td>
+                <td>
+                    <div class="progress progress-custom">
+                        <div class="progress-bar bg-gradient" style="width: ${percentage}%"></div>
+                    </div>
+                    <small class="text-muted">${percentage}%</small>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function updateQuickStats(data) {
+    const container = document.getElementById('quickStats');
+    
+    const averagePerDay = data.daily_stats.length > 0 ? 
+        (data.daily_stats.reduce((sum, day) => sum + day.count, 0) / data.daily_stats.length).toFixed(1) : 0;
+    
+    const mostActiveHour = data.hourly_stats.length > 0 ? 
+        data.hourly_stats.reduce((max, hour) => hour.count > max.count ? hour : max, data.hourly_stats[0]) : null;
+    
+    const topThreatType = data.type_stats ? 
+        Object.entries(data.type_stats).reduce((max, [type, count]) => count > max[1] ? [type, count] : max, ['', 0]) : ['', 0];
+    
+    container.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+            <div>
+                <div class="fw-semibold">Günlük Ortalama</div>
+                <small class="text-muted">Log sayısı</small>
+            </div>
+            <div class="text-end">
+                <h5 class="mb-0 text-primary">${averagePerDay}</h5>
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+            <div>
+                <div class="fw-semibold">En Aktif Saat</div>
+                <small class="text-muted">Son 24 saat</small>
+            </div>
+            <div class="text-end">
+                <h5 class="mb-0 text-success">${mostActiveHour ? mostActiveHour.hour : '-'}</h5>
+                <small class="text-muted">${mostActiveHour ? mostActiveHour.count + ' log' : ''}</small>
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+            <div>
+                <div class="fw-semibold">Başlıca Tehdit</div>
+                <small class="text-muted">Tip bazında</small>
+            </div>
+            <div class="text-end">
+                <h6 class="mb-0 text-warning">${topThreatType[0] || '-'}</h6>
+                <small class="text-muted">${topThreatType[1]} log</small>
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+            <div>
+                <div class="fw-semibold">Son 24 Saat</div>
+                <small class="text-muted">Aktivite</small>
+            </div>
+            <div class="text-end">
+                <h5 class="mb-0 text-info">${data.last_24h_count}</h5>
+                <small class="text-muted">yeni log</small>
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <div class="fw-semibold">Kritik Oran</div>
+                <small class="text-muted">Toplam içinde</small>
+            </div>
+            <div class="text-end">
+                <h5 class="mb-0 text-danger">
+                    ${data.total_logs > 0 ? (((data.severity_stats.critical || 0) / data.total_logs) * 100).toFixed(1) : 0}%
+                </h5>
+            </div>
+        </div>
+    `;
+}
+
+function refreshStats() {
+    showAlert('info', 'İstatistikler yenileniyor...', 2000);
+    loadStatistics();
+}
+
+function exportStats() {
+    // Bu fonksiyon gelecekte PDF/Excel export için kullanılabilir
+    showAlert('info', 'Rapor indirme özelliği yakında eklenecek.', 3000);
+}
+
+function checkAuthenticationAndRedirect() {
+    const token = localStorage.getItem('access_token');
+    if (!token && !window.location.href.includes('_redirect=true')) {
+        window.location.href = '/login/?_redirect=true';
+        return;
+    }
+}
+
+// Responsive chart handling
+window.addEventListener('resize', function() {
+    Object.values(charts).forEach(chart => {
+        if (chart && typeof chart.resize === 'function') {
+            chart.resize();
+        }
+    });
+});
+</script>
+{% endblock %}

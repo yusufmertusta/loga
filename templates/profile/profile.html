@@ -1,0 +1,789 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profile - Log Analyzer{% endblock %}
+{% block page_title %}Profile Settings{% endblock %}
+
+{% block content %}
+<!-- Profile Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white;">
+            <div class="card-body p-4">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <div class="d-flex align-items-center">
+                            <div class="me-4">
+                                <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 1rem; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-user fa-2x"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="mb-1" id="profileHeaderName">User Profile</h3>
+                                <p class="mb-2 opacity-75" id="profileHeaderEmail">user@example.com</p>
+                                <div class="d-flex gap-3">
+                                    <span class="badge" style="background: rgba(255,255,255,0.2); padding: 0.5rem 1rem;">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        <span id="profileHeaderJoined">Member since 2024</span>
+                                    </span>
+                                    <span class="badge" style="background: rgba(255,255,255,0.2); padding: 0.5rem 1rem;">
+                                        <i class="fas fa-chart-line me-1"></i>
+                                        <span id="profileHeaderStats">0 logs uploaded</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 text-lg-end">
+                        <div class="d-flex justify-content-lg-end justify-content-start gap-2 mt-3 mt-lg-0">
+                            <button class="btn btn-light btn-sm" onclick="refreshProfile()">
+                                <i class="fas fa-sync-alt me-1"></i>Refresh
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="confirmLogout()">
+                                <i class="fas fa-sign-out-alt me-1"></i>Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Profile Information Card -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title">Profile Information</h6>
+                <p class="card-subtitle">Personal details and account info</p>
+            </div>
+            <div class="card-body text-center">
+                <div style="width: 100px; height: 100px; background: var(--bg-main); border-radius: 1rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                    <i class="fas fa-user fa-3x" style="color: var(--primary);"></i>
+                </div>
+                
+                <h5 class="mb-2" id="profileFullName">Loading...</h5>
+                <p class="text-muted mb-3" id="profileUsername">@loading</p>
+                <p class="text-muted mb-4" id="profileEmail">loading@example.com</p>
+                
+                <div class="row text-center mb-4">
+                    <div class="col-6">
+                        <div style="border-right: 1px solid var(--border-color); padding-right: 1rem;">
+                            <h4 style="color: var(--primary); margin-bottom: 0.25rem;" id="userLogCount">0</h4>
+                            <small class="text-muted">Logs Uploaded</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div style="padding-left: 1rem;">
+                            <h4 style="color: var(--success); margin-bottom: 0.25rem;" id="userUploadCount">0</h4>
+                            <small class="text-muted">Upload Sessions</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-muted" style="font-size: 0.875rem;">
+                    <i class="fas fa-calendar me-2"></i>
+                    Member since: <span id="memberSince">Loading...</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="card-title">Quick Actions</h6>
+                <p class="card-subtitle">Frequently used features</p>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-3">
+                    <a href="/upload/" class="btn btn-primary btn-sm">
+                        <i class="fas fa-upload me-2"></i>
+                        Upload New CSV
+                    </a>
+                    <a href="/logs/" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-list me-2"></i>
+                        View My Logs
+                    </a>
+                    <a href="/statistics/" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        View Statistics
+                    </a>
+                    <button class="btn btn-secondary btn-sm" onclick="showChangePasswordModal()">
+                        <i class="fas fa-key me-2"></i>
+                        Change Password
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Profile Settings -->
+    <div class="col-lg-8">
+        <!-- Update Profile Form -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="card-title">Update Profile</h6>
+                <p class="card-subtitle">Modify your personal information</p>
+            </div>
+            <div class="card-body">
+                <form id="profileUpdateForm">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="firstName" class="form-label">
+                                <i class="fas fa-user me-1"></i>First Name
+                            </label>
+                            <input type="text" class="form-control" id="firstName" name="first_name" required>
+                            <div class="invalid-feedback" id="firstNameError"></div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="lastName" class="form-label">
+                                <i class="fas fa-user me-1"></i>Last Name
+                            </label>
+                            <input type="text" class="form-control" id="lastName" name="last_name" required>
+                            <div class="invalid-feedback" id="lastNameError"></div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope me-1"></i>Email Address
+                            </label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                            <div class="invalid-feedback" id="emailError"></div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary" id="updateButton">
+                                <span id="updateButtonText">
+                                    <i class="fas fa-save me-2"></i>Update Profile
+                                </span>
+                                <div class="spinner-border spinner-border-sm ms-2" id="updateSpinner" style="display: none;"></div>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Upload History -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="card-title">Upload History</h6>
+                <p class="card-subtitle">Recent file uploads and their status</p>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>File Name</th>
+                                <th>Date</th>
+                                <th>Records</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="uploadHistoryTable">
+                            <tr>
+                                <td colspan="4" class="text-center py-4">
+                                    <div class="d-flex justify-content-center align-items-center">
+                                        <div class="spinner-border text-primary me-2" role="status" style="width: 1rem; height: 1rem;">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <span class="text-muted">Loading upload history...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Account Settings -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title">Account Settings</h6>
+                <p class="card-subtitle">Preferences and security options</p>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-between align-items-center p-3 rounded-lg" style="background: var(--bg-main);">
+                            <div>
+                                <div style="font-weight: 500; margin-bottom: 0.25rem;">Email Notifications</div>
+                                <div style="font-size: 0.875rem; color: var(--text-muted);">Get updates about new features</div>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-between align-items-center p-3 rounded-lg" style="background: var(--bg-main);">
+                            <div>
+                                <div style="font-weight: 500; margin-bottom: 0.25rem;">Auto Refresh</div>
+                                <div style="font-size: 0.875rem; color: var(--text-muted);">Automatically refresh dashboard</div>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="autoRefresh" checked>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-12">
+                        <hr style="border-color: var(--border-color);">
+                        <div class="p-4 rounded-lg" style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2);">
+                            <h6 style="color: var(--danger); margin-bottom: 1rem;">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Danger Zone
+                            </h6>
+                            <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem;">
+                                Once you delete your account, there is no going back. 
+                                Please be certain about this action.
+                            </p>
+                            <button class="btn btn-danger btn-sm" onclick="showDeleteAccountModal()">
+                                <i class="fas fa-trash me-2"></i>
+                                Delete Account
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-key me-2"></i>
+                    Change Password
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="changePasswordForm">
+                    <div class="form-group mb-3">
+                        <label for="currentPassword" class="form-label">Current Password</label>
+                        <input type="password" class="form-control" id="currentPassword" required>
+                        <div class="invalid-feedback" id="currentPasswordError"></div>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="newPassword" required>
+                        <div style="font-size: 0.875rem; color: var(--text-muted); margin-top: 0.25rem;">
+                            Must be at least 8 characters long
+                        </div>
+                        <div class="invalid-feedback" id="newPasswordError"></div>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" required>
+                        <div class="invalid-feedback" id="confirmPasswordError"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="changePassword()">
+                    <i class="fas fa-save me-2"></i>
+                    Change Password
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: var(--danger); color: white;">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Delete Account
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Warning!</strong> This action cannot be undone. 
+                    Your account and all data will be permanently deleted.
+                </div>
+                
+                <p>Are you absolutely sure you want to delete your account?</p>
+                
+                <div class="form-group">
+                    <label for="deleteConfirmPassword" class="form-label">Enter your password to confirm:</label>
+                    <input type="password" class="form-control" id="deleteConfirmPassword" placeholder="Current password">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="deleteAccount()">
+                    <i class="fas fa-trash me-2"></i>
+                    Permanently Delete Account
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Logout Confirmation Modal -->
+<div class="modal fade" id="logoutModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-sign-out-alt me-2"></i>
+                    Confirm Logout
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-question-circle fa-3x" style="color: var(--warning);"></i>
+                </div>
+                <p>Are you sure you want to logout?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="performLogout()">
+                    <i class="fas fa-sign-out-alt me-2"></i>
+                    Yes, Logout
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let userProfile = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Auth check
+    checkAuthenticationAndRedirect();
+    
+    // Load profile data
+    loadProfile();
+    loadUploadHistory();
+    
+    // Form submit event
+    document.getElementById('profileUpdateForm').addEventListener('submit', updateProfile);
+    
+    // Settings change handlers
+    initializeSettingsHandlers();
+});
+
+async function loadProfile() {
+    try {
+        const token = localStorage.getItem('access_token');
+        const response = await fetch('/api/profile/', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            userProfile = data;
+            updateProfileDisplay(data);
+            fillProfileForm(data.user);
+        } else {
+            throw new Error('Profile could not be loaded');
+        }
+        
+    } catch (error) {
+        console.error('Profile load error:', error);
+        showAlert('danger', 'Error loading profile information.');
+    }
+}
+
+function updateProfileDisplay(data) {
+    const user = data.user;
+    const stats = data.stats || { logs_uploaded: 0, upload_sessions: 0 };
+    
+    const fullName = (user.first_name && user.last_name) ? 
+        `${user.first_name} ${user.last_name}` : user.username;
+    const joinDate = new Date(user.date_joined).toLocaleDateString();
+    
+    // Update profile card
+    document.getElementById('profileFullName').textContent = fullName;
+    document.getElementById('profileUsername').textContent = `@${user.username}`;
+    document.getElementById('profileEmail').textContent = user.email || 'No email provided';
+    document.getElementById('userLogCount').textContent = stats.logs_uploaded.toLocaleString();
+    document.getElementById('userUploadCount').textContent = stats.upload_sessions.toLocaleString();
+    document.getElementById('memberSince').textContent = joinDate;
+    
+    // Update header
+    document.getElementById('profileHeaderName').textContent = fullName;
+    document.getElementById('profileHeaderEmail').textContent = user.email || 'No email provided';
+    document.getElementById('profileHeaderJoined').textContent = `Member since ${new Date(user.date_joined).getFullYear()}`;
+    document.getElementById('profileHeaderStats').textContent = `${stats.logs_uploaded} logs uploaded`;
+}
+
+function fillProfileForm(user) {
+    document.getElementById('firstName').value = user.first_name || '';
+    document.getElementById('lastName').value = user.last_name || '';
+    document.getElementById('email').value = user.email || '';
+}
+
+async function updateProfile(e) {
+    e.preventDefault();
+    
+    const updateButton = document.getElementById('updateButton');
+    const updateSpinner = document.getElementById('updateSpinner');
+    const updateButtonText = document.getElementById('updateButtonText');
+    
+    // Loading state
+    updateButton.disabled = true;
+    updateSpinner.style.display = 'inline-block';
+    updateButtonText.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
+    
+    clearFormErrors();
+    
+    try {
+        const formData = {
+            first_name: document.getElementById('firstName').value,
+            last_name: document.getElementById('lastName').value,
+            email: document.getElementById('email').value
+        };
+        
+        const token = localStorage.getItem('access_token');
+        const response = await fetch('/api/profile/', {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showAlert('success', 'Profile updated successfully!');
+            
+            // Update localStorage user data
+            const userData = JSON.parse(localStorage.getItem('user_data'));
+            userData.first_name = formData.first_name;
+            userData.last_name = formData.last_name;
+            userData.email = formData.email;
+            localStorage.setItem('user_data', JSON.stringify(userData));
+            
+            // Update profile display
+            updateProfileDisplay({user: userData, stats: userProfile.stats});
+            
+        } else {
+            // Show error messages
+            Object.keys(data).forEach(field => {
+                if (data[field] && Array.isArray(data[field])) {
+                    showFieldError(field, data[field][0]);
+                }
+            });
+        }
+        
+    } catch (error) {
+        console.error('Profile update error:', error);
+        showAlert('danger', 'Error updating profile.');
+    } finally {
+        updateButton.disabled = false;
+        updateSpinner.style.display = 'none';
+        updateButtonText.innerHTML = '<i class="fas fa-save me-2"></i>Update Profile';
+    }
+}
+
+async function loadUploadHistory() {
+    try {
+        const token = localStorage.getItem('access_token');
+        const response = await fetch('/api/upload-history/', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const history = await response.json();
+            updateUploadHistoryTable(history);
+        }
+    } catch (error) {
+        console.error('Upload history error:', error);
+        document.getElementById('uploadHistoryTable').innerHTML = `
+            <tr>
+                <td colspan="4" class="text-center py-4 text-muted">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Could not load upload history
+                </td>
+            </tr>
+        `;
+    }
+}
+
+function updateUploadHistoryTable(history) {
+    const tbody = document.getElementById('uploadHistoryTable');
+    
+    if (!history || history.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4" class="text-center py-4 text-muted">
+                    <i class="fas fa-inbox me-2"></i>
+                    No uploads yet
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = history.slice(0, 10).map(item => `
+        <tr>
+            <td>
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-file-csv me-2" style="color: var(--success);"></i>
+                    <div>
+                        <div style="font-weight: 500; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" 
+                             title="${item.filename}">
+                            ${item.filename}
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <span style="font-size: 0.875rem; color: var(--text-muted);">
+                    ${item.upload_time_formatted || new Date(item.created_at).toLocaleDateString()}
+                </span>
+            </td>
+            <td>
+                <span class="badge badge-primary">${item.record_count || 0}</span>
+            </td>
+            <td>
+                <span class="badge ${item.success ? 'badge-success' : 'badge-danger'}">
+                    <i class="fas ${item.success ? 'fa-check' : 'fa-times'} me-1"></i>
+                    ${item.success ? 'Success' : 'Failed'}
+                </span>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function showChangePasswordModal() {
+    const modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+    modal.show();
+}
+
+function showDeleteAccountModal() {
+    const modal = new bootstrap.Modal(document.getElementById('deleteAccountModal'));
+    modal.show();
+}
+
+function confirmLogout() {
+    const modal = new bootstrap.Modal(document.getElementById('logoutModal'));
+    modal.show();
+}
+
+function performLogout() {
+    // Close modal first
+    const modal = bootstrap.Modal.getInstance(document.getElementById('logoutModal'));
+    modal.hide();
+    
+    // Show loading message
+    showAlert('info', 'Logging out...', 2000);
+    
+    // Perform logout after a short delay
+    setTimeout(() => {
+        logout();
+    }, 1000);
+}
+
+function logout() {
+    // Clear all authentication data
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user_data');
+    
+    // Clear any other app-specific data
+    localStorage.removeItem('autoRefresh');
+    
+    // Show success message and redirect
+    showAlert('success', 'Successfully logged out. Redirecting...', 2000);
+    
+    setTimeout(() => {
+        window.location.href = '/';
+    }, 1500);
+}
+
+function refreshProfile() {
+    showAlert('info', 'Refreshing profile data...', 2000);
+    loadProfile();
+    loadUploadHistory();
+}
+
+async function changePassword() {
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    // Validation
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        showAlert('warning', 'Please fill in all fields.');
+        return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+        showAlert('warning', 'New passwords do not match.');
+        return;
+    }
+    
+    if (newPassword.length < 8) {
+        showAlert('warning', 'New password must be at least 8 characters long.');
+        return;
+    }
+    
+    try {
+        const token = localStorage.getItem('access_token');
+        const response = await fetch('/api/auth/change-password/', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                current_password: currentPassword,
+                new_password: newPassword
+            })
+        });
+        
+        if (response.ok) {
+            showAlert('success', 'Password changed successfully!');
+            
+            // Close modal and reset form
+            const modal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
+            modal.hide();
+            document.getElementById('changePasswordForm').reset();
+            
+        } else {
+            const data = await response.json();
+            showAlert('danger', data.error || 'Error changing password.');
+        }
+        
+    } catch (error) {
+        console.error('Change password error:', error);
+        showAlert('danger', 'Error changing password.');
+    }
+}
+
+async function deleteAccount() {
+    const password = document.getElementById('deleteConfirmPassword').value;
+    
+    if (!password) {
+        showAlert('warning', 'Please enter your password.');
+        return;
+    }
+    
+    if (!confirm('Are you absolutely sure you want to delete your account? This action cannot be undone!')) {
+        return;
+    }
+    
+    try {
+        const token = localStorage.getItem('access_token');
+        const response = await fetch('/api/auth/delete-account/', {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                password: password
+            })
+        });
+        
+        if (response.ok) {
+            showAlert('success', 'Account deleted successfully. Redirecting...');
+            
+            // Logout and redirect to home
+            setTimeout(() => {
+                logout();
+            }, 2000);
+            
+        } else {
+            const data = await response.json();
+            showAlert('danger', data.error || 'Error deleting account.');
+        }
+        
+    } catch (error) {
+        console.error('Delete account error:', error);
+        showAlert('danger', 'Error deleting account.');
+    }
+}
+
+function initializeSettingsHandlers() {
+    // Email notifications toggle
+    document.getElementById('emailNotifications').addEventListener('change', function() {
+        const enabled = this.checked;
+        showAlert('info', `Email notifications ${enabled ? 'enabled' : 'disabled'}.`, 2000);
+    });
+    
+    // Auto refresh toggle
+    document.getElementById('autoRefresh').addEventListener('change', function() {
+        const enabled = this.checked;
+        localStorage.setItem('autoRefresh', enabled);
+        showAlert('info', `Auto refresh ${enabled ? 'enabled' : 'disabled'}.`, 2000);
+    });
+    
+    // Load saved settings
+    const autoRefreshSetting = localStorage.getItem('autoRefresh');
+    if (autoRefreshSetting !== null) {
+        document.getElementById('autoRefresh').checked = autoRefreshSetting === 'true';
+    }
+}
+
+function clearFormErrors() {
+    document.querySelectorAll('.is-invalid').forEach(el => {
+        el.classList.remove('is-invalid');
+    });
+    document.querySelectorAll('.invalid-feedback').forEach(el => {
+        el.textContent = '';
+    });
+}
+
+function showFieldError(fieldName, message) {
+    const fieldMap = {
+        'first_name': 'firstName',
+        'last_name': 'lastName',
+        'email': 'email'
+    };
+    
+    const fieldId = fieldMap[fieldName] || fieldName;
+    const field = document.getElementById(fieldId);
+    const errorDiv = document.getElementById(fieldId + 'Error');
+    
+    if (field && errorDiv) {
+        field.classList.add('is-invalid');
+        errorDiv.textContent = message;
+    }
+}
+
+function checkAuthenticationAndRedirect() {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        window.location.href = '/login/';
+        return;
+    }
+}
+
+// Global logout function that can be called from anywhere
+window.logout = logout;
+</script>
+{% endblock %}
+        '

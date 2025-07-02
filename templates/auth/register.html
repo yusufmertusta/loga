@@ -1,0 +1,359 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Kayıt Ol - Log Analyzer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-success text-white text-center py-4">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Hesap Oluştur
+                    </h4>
+                </div>
+                
+                <div class="card-body p-5">
+                    <form id="registerForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="first_name" class="form-label fw-semibold">
+                                    <i class="fas fa-user me-2"></i>Ad
+                                </label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" required>
+                                <div class="invalid-feedback" id="first_nameError"></div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="last_name" class="form-label fw-semibold">
+                                    <i class="fas fa-user me-2"></i>Soyad
+                                </label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" required>
+                                <div class="invalid-feedback" id="last_nameError"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="username" class="form-label fw-semibold">
+                                <i class="fas fa-at me-2"></i>Kullanıcı Adı
+                            </label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                            <div class="form-text">En az 3 karakter olmalıdır</div>
+                            <div class="invalid-feedback" id="usernameError"></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-semibold">
+                                <i class="fas fa-envelope me-2"></i>E-posta
+                            </label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                            <div class="invalid-feedback" id="emailError"></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label fw-semibold">
+                                <i class="fas fa-lock me-2"></i>Şifre
+                            </label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="form-text">En az 8 karakter olmalıdır</div>
+                            <div class="invalid-feedback" id="passwordError"></div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="password_confirm" class="form-label fw-semibold">
+                                <i class="fas fa-lock me-2"></i>Şifre Tekrar
+                            </label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
+                                <button class="btn btn-outline-secondary" type="button" id="togglePasswordConfirm">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="invalid-feedback" id="password_confirmError"></div>
+                        </div>
+                        
+                        <!-- Şifre Güçlük Göstergesi -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">Şifre Güçlüğü:</label>
+                            <div class="password-strength">
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar" id="passwordStrengthBar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <small id="passwordStrengthText" class="text-muted"></small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="terms" required>
+                                <label class="form-check-label" for="terms">
+                                    <a href="#" class="text-decoration-none">Kullanım koşullarını</a> okudum ve kabul ediyorum
+                                </label>
+                                <div class="invalid-feedback" id="termsError"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg" id="registerButton">
+                                <i class="fas fa-user-plus me-2"></i>
+                                <span id="registerButtonText">Hesap Oluştur</span>
+                                <span class="spinner-border spinner-border-sm ms-2" id="registerSpinner" style="display: none;"></span>
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-center">
+                        <p class="text-muted mb-0">
+                            Zaten hesabınız var mı? 
+                            <a href="/login/" class="text-decoration-none fw-semibold">
+                                Giriş yapın
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.password-strength .progress-bar {
+    transition: all 0.3s ease;
+}
+
+.strength-weak {
+    background-color: #dc3545 !important;
+}
+
+.strength-medium {
+    background-color: #ffc107 !important;
+}
+
+.strength-strong {
+    background-color: #198754 !important;
+}
+
+.form-control:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+}
+
+.input-group .btn {
+    border-color: #ced4da;
+}
+
+.input-group .btn:hover {
+    background-color: #f8f9fa;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const registerForm = document.getElementById('registerForm');
+    const passwordInput = document.getElementById('password');
+    const passwordConfirmInput = document.getElementById('password_confirm');
+    const togglePassword = document.getElementById('togglePassword');
+    const togglePasswordConfirm = document.getElementById('togglePasswordConfirm');
+    const passwordStrengthBar = document.getElementById('passwordStrengthBar');
+    const passwordStrengthText = document.getElementById('passwordStrengthText');
+    const registerButton = document.getElementById('registerButton');
+    const registerSpinner = document.getElementById('registerSpinner');
+    const registerButtonText = document.getElementById('registerButtonText');
+    
+    // Şifre göster/gizle toggle'ları
+    togglePassword.addEventListener('click', function() {
+        togglePasswordVisibility(passwordInput, this);
+    });
+    
+    togglePasswordConfirm.addEventListener('click', function() {
+        togglePasswordVisibility(passwordConfirmInput, this);
+    });
+    
+    // Şifre güçlük kontrolü
+    passwordInput.addEventListener('input', function() {
+        checkPasswordStrength(this.value);
+        if (passwordConfirmInput.value) {
+            checkPasswordMatch();
+        }
+    });
+    
+    // Şifre eşleşme kontrolü
+    passwordConfirmInput.addEventListener('input', checkPasswordMatch);
+    
+    // Form submit
+    registerForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Loading state
+        setLoadingState(true);
+        clearErrors();
+        
+        // Form verilerini topla
+        const formData = {
+            username: document.getElementById('username').value,
+            email: document.getElementById('email').value,
+            first_name: document.getElementById('first_name').value,
+            last_name: document.getElementById('last_name').value,
+            password: document.getElementById('password').value,
+            password_confirm: document.getElementById('password_confirm').value
+        };
+        
+        try {
+            const response = await fetch('/api/auth/register/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                // Token'ları localStorage'a kaydet
+                localStorage.setItem('access_token', data.tokens.access);
+                localStorage.setItem('refresh_token', data.tokens.refresh);
+                localStorage.setItem('user_data', JSON.stringify(data.user));
+                
+                // Başarı mesajı göster
+                showAlert('success', 'Hesap başarıyla oluşturuldu! Yönlendiriliyorsunuz...');
+                
+                // Dashboard'a yönlendir
+                setTimeout(() => {
+                    window.location.href = '/dashboard/?_redirect=true';
+                }, 2000);
+                
+            } else {
+                // Hata mesajlarını göster
+                Object.keys(data).forEach(field => {
+                    if (data[field] && Array.isArray(data[field])) {
+                        showFieldError(field, data[field][0]);
+                    }
+                });
+                
+                if (data.non_field_errors) {
+                    showAlert('danger', data.non_field_errors[0]);
+                }
+            }
+            
+        } catch (error) {
+            console.error('Register error:', error);
+            showAlert('danger', 'Bağlantı hatası oluştu. Lütfen tekrar deneyin.');
+        } finally {
+            setLoadingState(false);
+        }
+    });
+    
+    function togglePasswordVisibility(input, button) {
+        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+        input.setAttribute('type', type);
+        
+        const icon = button.querySelector('i');
+        icon.classList.toggle('fa-eye');
+        icon.classList.toggle('fa-eye-slash');
+    }
+    
+    function checkPasswordStrength(password) {
+        const strength = calculatePasswordStrength(password);
+        
+        passwordStrengthBar.style.width = strength.score + '%';
+        passwordStrengthBar.className = 'progress-bar ' + strength.class;
+        passwordStrengthText.textContent = strength.text;
+    }
+    
+    function calculatePasswordStrength(password) {
+        let score = 0;
+        let text = '';
+        let className = '';
+        
+        if (password.length >= 8) score += 25;
+        if (/[a-z]/.test(password)) score += 25;
+        if (/[A-Z]/.test(password)) score += 25;
+        if (/[0-9]/.test(password)) score += 25;
+        if (/[^A-Za-z0-9]/.test(password)) score += 10;
+        
+        if (score < 50) {
+            text = 'Zayıf';
+            className = 'strength-weak';
+        } else if (score < 75) {
+            text = 'Orta';
+            className = 'strength-medium';
+        } else {
+            text = 'Güçlü';
+            className = 'strength-strong';
+        }
+        
+        return { score, text, class: className };
+    }
+    
+    function checkPasswordMatch() {
+        const password = passwordInput.value;
+        const passwordConfirm = passwordConfirmInput.value;
+        
+        if (passwordConfirm && password !== passwordConfirm) {
+            passwordConfirmInput.classList.add('is-invalid');
+            document.getElementById('password_confirmError').textContent = 'Şifreler eşleşmiyor';
+        } else {
+            passwordConfirmInput.classList.remove('is-invalid');
+            document.getElementById('password_confirmError').textContent = '';
+        }
+    }
+    
+    function setLoadingState(loading) {
+        registerButton.disabled = loading;
+        registerSpinner.style.display = loading ? 'inline-block' : 'none';
+        registerButtonText.textContent = loading ? 'Oluşturuluyor...' : 'Hesap Oluştur';
+    }
+    
+    function clearErrors() {
+        document.querySelectorAll('.is-invalid').forEach(el => {
+            el.classList.remove('is-invalid');
+        });
+        document.querySelectorAll('.invalid-feedback').forEach(el => {
+            el.textContent = '';
+        });
+    }
+    
+    function showFieldError(fieldName, message) {
+        const field = document.getElementById(fieldName);
+        const errorDiv = document.getElementById(fieldName + 'Error');
+        
+        if (field && errorDiv) {
+            field.classList.add('is-invalid');
+            errorDiv.textContent = message;
+        }
+    }
+    
+    // Eğer kullanıcı zaten giriş yapmışsa dashboard'a yönlendir
+    if (localStorage.getItem('access_token') && !window.location.href.includes('_redirect=true')) {
+        window.location.href = '/dashboard/?_redirect=true';
+    }
+});
+</script>
+{% endblock %}

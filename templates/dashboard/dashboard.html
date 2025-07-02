@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Log Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <span class="logo-text">SecureAnalyzer</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-item active">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-home"></i>
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-list-ul"></i>
+                            <span class="nav-text">Log Records</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-chart-bar"></i>
+                            <span class="nav-text">Analytics</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-upload"></i>
+                            <span class="nav-text">Upload CSV</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Management</div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-users"></i>
+                            <span class="nav-text">Users</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-cog"></i>
+                            <span class="nav-text">Settings</span>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=667eea&color=fff" alt="User">
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">Admin User</div>
+                        <div class="user-role">Administrator</div>
+                    </div>
+                    <button class="user-menu-toggle">
+                        <i class="fas fa-chevron-up"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <h1 class="page-title">Dashboard</h1>
+                    <p class="page-subtitle">Monday, December 18, 2023</p>
+                </div>
+                <div class="header-right">
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" placeholder="Search threats, IPs...">
+                    </div>
+                    <div class="header-actions">
+                        <button class="action-btn notification-btn">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">3</span>
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Stats Overview -->
+                <div class="stats-grid">
+                    <div class="stat-card primary">
+                        <div class="stat-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="totalThreats">24,847</div>
+                            <div class="stat-label">Total Threats</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+12.5%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card success">
+                        <div class="stat-icon">
+                            <i class="fas fa-shield-check"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="blockedThreats">1,247</div>
+                            <div class="stat-label">Blocked Threats</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+8.2%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card warning">
+                        <div class="stat-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="activeThreats">47</div>
+                            <div class="stat-label">Active Threats</div>
+                            <div class="stat-change negative">
+                                <i class="fas fa-arrow-down"></i>
+                                <span>-3.1%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card info">
+                        <div class="stat-icon">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="uniqueIps">8,924</div>
+                            <div class="stat-label">Unique IPs</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+15.7%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-grid">
+                    <!-- Threat Analysis Chart -->
+                    <div class="chart-card large">
+                        <div class="card-header">
+                            <div class="card-title-section">
+                                <h3 class="card-title">Threat Analysis</h3>
+                                <p class="card-subtitle">Real-time threat detection trends</p>
+                            </div>
+                            <div class="card-actions">
+                                <div class="time-filter">
+                                    <button class="filter-btn active">7D</button>
+                                    <button class="filter-btn">30D</button>
+                                    <button class="filter-btn">90D</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <canvas id="threatAnalysisChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Severity Distribution -->
+                    <div class="chart-card medium">
+                        <div class="card-header">
+                            <div class="card-title-section">
+                                <h3 class="card-title">Severity Distribution</h3>
+                                <p class="card-subtitle">Threat severity breakdown</p>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <canvas id="severityChart"></canvas>
+                            <div class="severity-legend">
+                                <div class="legend-item">
+                                    <div class="legend-color critical"></div>
+                                    <div class="legend-info">
+                                        <div class="legend-label">Critical</div>
+                                        <div class="legend-value" id="criticalCount">127</div>
+                                    </div>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color high"></div>
+                                    <div class="legend-info">
+                                        <div class="legend-label">High</div>
+                                        <div class="legend-value" id="highCount">453</div>
+                                    </div>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color medium"></div>
+                                    <div class="legend-info">
+                                        <div class="legend-label">Medium</div>
+                                        <div class="legend-value" id="mediumCount">832</div>
+                                    </div>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color low"></div>
+                                    <div class="legend-info">
+                                        <div class="legend-label">Low</div>
+                                        <div class="legend-value" id="lowCount">1,247</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Tables Section -->
+                <div class="tables-grid">
+                    <!-- Recent Threats -->
+                    <div class="table-card">
+                        <div class="card-header">
+                            <div class="card-title-section">
+                                <h3 class="card-title">Recent Threats</h3>
+                                <p class="card-subtitle">Latest security incidents</p>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn-secondary">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    View All
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="data-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Time</th>
+                                            <th>Threat</th>
+                                            <th>Source IP</th>
+                                            <th>Severity</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentThreatsTable">
+                                        <tr>
+                                            <td>
+                                                <div class="time-info">
+                                                    <div class="time">14:23</div>
+                                                    <div class="date">Dec 18</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="threat-info">
+                                                    <div class="threat-name">SQL Injection Attempt</div>
+                                                    <div class="threat-type">Web Attack</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <code class="ip-address">192.168.1.100</code>
+                                            </td>
+                                            <td>
+                                                <span class="severity-badge critical">Critical</span>
+                                            </td>
+                                            <td>
+                                                <span class="status-badge blocked">Blocked</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="time-info">
+                                                    <div class="time">14:18</div>
+                                                    <div class="date">Dec 18</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="threat-info">
+                                                    <div class="threat-name">Malware Detection</div>
+                                                    <div class="threat-type">Malware</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <code class="ip-address">10.0.0.45</code>
+                                            </td>
+                                            <td>
+                                                <span class="severity-badge high">High</span>
+                                            </td>
+                                            <td>
+                                                <span class="status-badge quarantined">Quarantined</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="time-info">
+                                                    <div class="time">14:12</div>
+                                                    <div class="date">Dec 18</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="threat-info">
+                                                    <div class="threat-name">Brute Force Attack</div>
+                                                    <div class="threat-type">Authentication</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <code class="ip-address">203.0.113.45</code>
+                                            </td>
+                                            <td>
+                                                <span class="severity-badge medium">Medium</span>
+                                            </td>
+                                            <td>
+                                                <span class="status-badge investigating">Investigating</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Status -->
+                    <div class="status-card">
+                        <div class="card-header">
+                            <div class="card-title-section">
+                                <h3 class="card-title">System Status</h3>
+                                <p class="card-subtitle">Real-time monitoring</p>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="status-grid">
+                                <div class="status-item">
+                                    <div class="status-info">
+                                        <div class="status-label">CPU Usage</div>
+                                        <div class="status-value">67%</div>
+                                    </div>
+                                    <div class="status-bar">
+                                        <div class="status-progress" style="width: 67%"></div>
+                                    </div>
+                                </div>
+                                <div class="status-item">
+                                    <div class="status-info">
+                                        <div class="status-label">Memory</div>
+                                        <div class="status-value">84%</div>
+                                    </div>
+                                    <div class="status-bar">
+                                        <div class="status-progress warning" style="width: 84%"></div>
+                                    </div>
+                                </div>
+                                <div class="status-item">
+                                    <div class="status-info">
+                                        <div class="status-label">Network</div>
+                                        <div class="status-value">43%</div>
+                                    </div>
+                                    <div class="status-bar">
+                                        <div class="status-progress" style="width: 43%"></div>
+                                    </div>
+                                </div>
+                                <div class="status-item">
+                                    <div class="status-info">
+                                        <div class="status-label">Storage</div>
+                                        <div class="status-value">28%</div>
+                                    </div>
+                                    <div class="status-bar">
+                                        <div class="status-progress" style="width: 28%"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="system-health">
+                                <div class="health-indicator">
+                                    <div class="health-icon">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="health-info">
+                                        <div class="health-status">System Healthy</div>
+                                        <div class="health-description">All services operational</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>
